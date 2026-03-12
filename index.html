@@ -492,16 +492,16 @@ function showScreen(name) {
 }
 
 async function detectRoute() {
-  const { data: mem } = await sb
+  const { data: memRows, error: memErr } = await sb
     .from('household_members')
     .select('person_number, display_name, household_id')
-    .eq('user_id', currentUser.id)
-    .single();
+    .eq('user_id', currentUser.id);
 
-  if (!mem) {
+  if (memErr || !memRows || memRows.length === 0) {
     showScreen('onboard');
     return;
   }
+  const mem = memRows[0];
 
   membership = { person_number: mem.person_number, display_name: mem.display_name };
 
