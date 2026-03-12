@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L & J Finance</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#141210;--bg2:#1c1917;--bg3:#242120;
+  --border:#2e2b27;--border2:#3d3930;
+  --brass:#c8963c;--brass-dim:#3a2a10;--brass-light:#e8b85a;
+  --copper:#b05a38;--copper-dim:#3a1a10;
+  --sage:#6a9478;--sage-dim:#1a2e22;
+  --slate:#5a7898;--slate-dim:#182030;
+  --rose:#b86060;--rose-dim:#301818;
+  --text:#e8e0d0;--text-dim:#7a7060;--text-mid:#a89880;
+  --good:#6aaa7a;--warn:#c89040;--danger:#c86060;
+  --liam:#7a9aba;--jacynta:#8aba8a;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;font-size:14px}
+
+/* ── LOGIN ── */
+#loginScreen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:24px;
+}
+.login-box{
+  background:var(--bg2);border:1px solid var(--border2);border-radius:12px;
+  padding:48px 40px;width:100%;max-width:400px;
+}
+.login-logo{
+  font-family:'Playfair Display',serif;font-size:2rem;font-style:italic;
+  color:var(--brass);text-align:center;margin-bottom:8px;
+}
+.login-sub{font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);text-align:center;margin-bottom:36px}
+.login-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.login-label{font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim)}
+.login-input{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:6px;
+  padding:10px 14px;font-family:'DM Mono',monospace;font-size:0.8rem;
+  color:var(--text);outline:none;transition:border-color 0.15s;
+}
+.login-input:focus{border-color:var(--brass)}
+.login-btn{
+  width:100%;padding:12px;background:var(--brass);border:none;border-radius:6px;
+  font-family:'DM Mono',monospace;font-size:0.75rem;font-weight:500;
+  color:#1a1410;cursor:pointer;margin-top:8px;letter-spacing:0.05em;
+  transition:background 0.15s;
+}
+.login-btn:hover{background:var(--brass-light)}
+.login-err{font-size:0.62rem;color:var(--danger);text-align:center;margin-top:10px;min-height:18px}
+.login-switch{font-size:0.62rem;color:var(--text-dim);text-align:center;margin-top:16px;cursor:pointer}
+.login-switch span{color:var(--brass);text-decoration:underline}
+
+/* ── HUD ── */
+.hud{
+  position:sticky;top:0;z-index:100;background:var(--bg2);
+  border-bottom:1px solid var(--border2);padding:0 20px;
+  display:flex;align-items:center;gap:0;height:52px;
+}
+.hud-brand{
+  font-family:'Playfair Display',serif;font-size:1rem;font-style:italic;
+  color:var(--brass);padding-right:20px;border-right:1px solid var(--border);
+  margin-right:20px;white-space:nowrap;
+}
+.hud-stats{display:flex;gap:0;flex:1;overflow-x:auto}
+.hud-stat{display:flex;flex-direction:column;padding:0 16px;border-right:1px solid var(--border);min-width:110px}
+.hud-stat:first-child{padding-left:0}
+.hs-label{font-size:0.5rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:2px}
+.hs-value{font-size:0.78rem;font-weight:500;line-height:1}
+.hs-value.debt{color:var(--danger)}.hs-value.good{color:var(--good)}
+.hs-value.brass{color:var(--brass)}.hs-value.warn{color:var(--warn)}
+.hud-user{font-size:0.58rem;color:var(--text-dim);padding-left:16px;white-space:nowrap;cursor:pointer}
+.hud-user:hover{color:var(--danger)}
+
+/* ── SYNC STATUS ── */
+.sync-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--text-dim);
+  display:inline-block;margin-right:6px;transition:background 0.3s;
+}
+.sync-dot.synced{background:var(--good)}
+.sync-dot.syncing{background:var(--warn);animation:pulse 1s infinite}
+.sync-dot.error{background:var(--danger)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* ── TABS ── */
+.tabs{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:0 20px;display:flex;gap:0;overflow-x:auto;
+}
+.tab{
+  padding:11px 16px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;
+  transition:all 0.15s;white-space:nowrap;user-select:none;
+}
+.tab:hover{color:var(--text-mid)}
+.tab.active{color:var(--brass);border-bottom-color:var(--brass)}
+
+/* ── PANELS ── */
+.panel{display:none;padding:24px 20px 80px;max-width:1000px;margin:0 auto}
+.panel.active{display:block}
+
+/* ── MONTH NAVIGATOR ── */
+.month-nav{
+  display:flex;align-items:center;gap:16px;margin-bottom:20px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  padding:12px 16px;
+}
+.mn-btn{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:5px;
+  padding:5px 12px;font-family:'DM Mono',monospace;font-size:0.65rem;
+  color:var(--text-dim);cursor:pointer;transition:all 0.15s;
+}
+.mn-btn:hover{color:var(--text);border-color:var(--brass)}
+.mn-label{font-family:'Playfair Display',serif;font-size:1.1rem;font-style:italic;color:var(--brass);flex:1;text-align:center}
+.mn-note{font-size:0.58rem;color:var(--text-dim)}
+
+/* ── SEC HEADER ── */
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.sec-head h2{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:400;color:var(--text);font-style:italic}
+.sh-sub{font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim)}
+.phase-badge{display:inline-block;background:var(--brass-dim);border:1px solid var(--brass);border-radius:4px;padding:3px 10px;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--brass)}
+
+/* ── GRIDS ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+@media(max-width:700px){.grid4{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+
+/* ── CARD ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px}
+.card.brass-accent{border-left:3px solid var(--brass)}
+.card.sage-accent{border-left:3px solid var(--sage)}
+.card.slate-accent{border-left:3px solid var(--slate)}
+.card.rose-accent{border-left:3px solid var(--rose)}
+.c-label{font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px}
+.c-value{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;line-height:1;margin-bottom:4px}
+.c-sub{font-size:0.58rem;color:var(--text-dim);line-height:1.5}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:20px 0}
+
+/* ── PROGRESS ── */
+.prog-wrap{margin:8px 0 4px}
+.prog-label{display:flex;justify-content:space-between;font-size:0.56rem;color:var(--text-dim);margin-bottom:4px}
+.prog-track{height:5px;background:var(--border2);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width 0.8s ease}
+
+/* ── STAT ROW ── */
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.63rem}
+.stat-row:last-child{border-bottom:none}
+.sr-label{color:var(--text-dim)}.sr-value{color:var(--text);font-weight:500}
+
+/* ── DEBT CARDS ── */
+.debt-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:8px;border-left:3px solid}
+.dc-top{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:start;margin-bottom:10px}
+.dc-badge{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.58rem;font-weight:500;flex-shrink:0;margin-top:2px}
+.dc-name{font-size:0.7rem;color:var(--text);font-weight:500}
+.dc-sub{font-size:0.56rem;color:var(--text-dim);margin-top:2px}
+.dc-bal{font-family:'Playfair Display',serif;font-size:1.2rem;text-align:right}
+.dc-rate{font-size:0.56rem;color:var(--text-dim);text-align:right}
+.dc-stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);padding-top:10px}
+.dc-stat{padding-right:10px}.dc-stat:not(:last-child){border-right:1px solid var(--border);margin-right:10px}
+.dcs-label{font-size:0.5rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim);margin-bottom:2px}
+.dcs-val{font-size:0.65rem;color:var(--text)}
+.dcs-val.accent{font-family:'Playfair Display',serif;color:var(--brass);font-size:0.78rem}
+.rollup{display:flex;align-items:center;gap:8px;padding:5px 12px;background:var(--bg3);border:1px dashed var(--border2);border-radius:5px;margin:0 0 8px;font-size:0.58rem;color:var(--text-dim)}
+.rollup::before{content:'↓';color:var(--brass);font-size:0.68rem}
+.rollup span{color:var(--brass)}
+
+/* ── BILLS TABLE ── */
+.bills-table{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.bt-head{display:grid;grid-template-columns:2fr 75px 75px 75px 85px;padding:7px 14px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.bt-head span{font-size:0.52rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim)}
+.bt-row{display:grid;grid-template-columns:2fr 75px 75px 75px 85px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center;transition:background 0.12s}
+.bt-row:last-child{border-bottom:none}
+.bt-row:hover{background:var(--bg3)}
+.btr-name{font-size:0.65rem;color:var(--text)}
+.btr-sub{font-size:0.53rem;color:var(--text-dim);margin-top:1px}
+.btr-amt{font-family:'Playfair Display',serif;font-size:0.82rem}
+.btr-liam{color:var(--liam);font-size:0.63rem;font-family:'Playfair Display',serif}
+.btr-jac{color:var(--jacynta);font-size:0.63rem;font-family:'Playfair Display',serif}
+.bt-total{display:grid;grid-template-columns:2fr 75px 75px 75px 85px;padding:11px 14px;background:var(--bg3);border-top:1px solid var(--border2)}
+.btt-v{font-family:'Playfair Display',serif;font-size:0.88rem}
+
+/* ── TOGGLE ── */
+.tog{display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.tog-box{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:0.58rem;transition:all 0.12s;flex-shrink:0}
+.tog-box.on{background:var(--good);border-color:var(--good);color:#fff}
+.tog-label{font-size:0.58rem;color:var(--text-dim)}
+.tog.on .tog-label{color:var(--good)}
+
+/* ── PAY ROW ── */
+.pay-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;margin-bottom:5px;cursor:pointer;transition:border-color 0.12s}
+.pay-row:hover{border-color:var(--border2)}
+.pr-date{font-size:0.62rem;color:var(--text-mid)}
+.pr-amt{font-family:'Playfair Display',serif;font-size:0.88rem}
+.pr-status{font-size:0.56rem;padding:2px 8px;border-radius:10px}
+.pr-status.done{background:#1a3020;color:var(--good);border:1px solid #2a5030}
+.pr-status.pend{background:var(--rose-dim);color:var(--rose);border:1px solid #502020}
+
+/* ── WEDDING ── */
+.wt-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;margin-bottom:6px;gap:12px}
+.wt-row.crunch{background:#2a1a0a;border-color:var(--warn)}
+.wtr-vendor{font-size:0.63rem;color:var(--text)}
+.wtr-date{font-size:0.58rem;color:var(--text-dim);white-space:nowrap}
+.wtr-amt{font-family:'Playfair Display',serif;font-size:0.88rem;color:var(--brass);white-space:nowrap}
+
+/* ── PROJ TABLE ── */
+.proj-row{display:grid;grid-template-columns:80px 80px 80px 1fr;padding:7px 12px;border-bottom:1px solid var(--border);font-size:0.62rem;align-items:center}
+.proj-row.header{background:var(--bg3);font-size:0.52rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim)}
+.proj-row.crunch{background:#2a1a0a}
+.pr-bal{font-family:'Playfair Display',serif;font-size:0.78rem;color:var(--brass)}
+.pr-note{padding-left:10px}
+
+/* ── WINDFALLS ── */
+.wf-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;margin-bottom:6px}
+.wf-label{font-size:0.63rem;color:var(--text)}
+.wf-sub{font-size:0.56rem;color:var(--text-dim);margin-top:1px}
+.wf-amt{font-family:'Playfair Display',serif;font-size:0.88rem;color:var(--good);white-space:nowrap}
+
+/* ── CHECKLIST ── */
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;margin-bottom:5px;cursor:pointer;transition:border-color 0.12s}
+.check-item:hover{border-color:var(--border2)}
+.check-item.done{opacity:0.45}
+.ci-box{width:17px;height:17px;border-radius:4px;border:1.5px solid var(--border2);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:0.62rem;flex-shrink:0;margin-top:1px;transition:all 0.12s}
+.check-item.done .ci-box{background:var(--good);border-color:var(--good);color:#fff}
+.ci-text{font-size:0.63rem;color:var(--text);line-height:1.4}
+.ci-owner{font-size:0.54rem;color:var(--text-dim);margin-top:2px}
+.check-sec-label{font-size:0.54rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--brass);margin:14px 0 7px;padding-bottom:4px;border-bottom:1px solid var(--brass-dim)}
+
+/* ── NET WORTH ── */
+.nw-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.63rem}
+.nw-row:last-child{border-bottom:none}
+.nwr-l{color:var(--text-dim)}.nwr-r{color:var(--text);font-family:'Playfair Display',serif}
+.nwr-r.pos{color:var(--good)}.nwr-r.neg{color:var(--danger)}
+.nw-total{display:flex;justify-content:space-between;padding:10px 0 0;border-top:1px solid var(--border2);margin-top:6px}
+.nwt-l{font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-mid)}
+.nwt-r{font-family:'Playfair Display',serif;font-size:1rem}
+.nw-head{font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+
+/* ── FIELD ── */
+.field-group{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field-label{font-size:0.56rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim)}
+.field-input{background:var(--bg3);border:1px solid var(--border2);border-radius:5px;padding:7px 11px;font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text);outline:none;width:100%;transition:border-color 0.15s}
+.field-input:focus{border-color:var(--brass)}
+
+/* ── NOTE ── */
+.note{background:var(--brass-dim);border:1px solid var(--brass);border-radius:6px;padding:11px 14px;font-size:0.6rem;color:var(--text-mid);line-height:1.7}
+.note strong{color:var(--brass)}
+
+/* ── SECTION LABEL ── */
+.sec-label{font-size:0.54rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--brass);margin:14px 0 7px;padding-bottom:4px;border-bottom:1px solid var(--brass-dim)}
+
+/* ── ANIMATE ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.panel.active>*{animation:fadeIn 0.25s ease both}
+.panel.active>*:nth-child(1){animation-delay:0.02s}
+.panel.active>*:nth-child(2){animation-delay:0.05s}
+.panel.active>*:nth-child(3){animation-delay:0.08s}
+.panel.active>*:nth-child(4){animation-delay:0.11s}
+.panel.active>*:nth-child(5){animation-delay:0.14s}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ -->
+<!-- LOGIN SCREEN -->
+<!-- ═══════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">L & J</div>
+    <div class="login-sub">Household Finance · Private</div>
+    <div class="login-field">
+      <div class="login-label">Email</div>
+      <input class="login-input" type="email" id="loginEmail" placeholder="you@email.com" autocomplete="email">
+    </div>
+    <div class="login-field">
+      <div class="login-label">Password</div>
+      <input class="login-input" type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleAuth()">
+    </div>
+    <button class="login-btn" onclick="handleAuth()" id="authBtn">Sign In</button>
+    <div class="login-err" id="loginErr"></div>
+    <div class="login-switch" id="authToggle" onclick="toggleAuthMode()">
+      No account? <span>Create one</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- APP -->
+<!-- ═══════════════════════════════ -->
+<div id="app" style="display:none">
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-brand">L & J</div>
+    <div class="hud-stats">
+      <div class="hud-stat">
+        <div class="hs-label">Combined income</div>
+        <div class="hs-value brass">$11,752/mo</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hs-label">Consumer debt</div>
+        <div class="hs-value debt" id="hudDebt">$27,475</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hs-label">Monthly attack</div>
+        <div class="hs-value warn">$1,559/mo</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hs-label">Debt-free</div>
+        <div class="hs-value good">Early 2029</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hs-label">Wedding fund</div>
+        <div class="hs-value warn" id="hudWedding">$0</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hs-label">Wedding</div>
+        <div class="hs-value brass" id="hudCountdown">—</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hs-label">Fire Fund</div>
+        <div class="hs-value danger" id="hudFire">$0</div>
+      </div>
+    </div>
+    <div class="hud-user" onclick="signOut()">
+      <span class="sync-dot" id="syncDot"></span>
+      <span id="hudUserEmail"></span> · sign out
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('dashboard',this)">Dashboard</div>
+    <div class="tab" onclick="showTab('budget',this)">Budget & Bills</div>
+    <div class="tab" onclick="showTab('debt',this)">Debt</div>
+    <div class="tab" onclick="showTab('wedding',this)">Wedding</div>
+    <div class="tab" onclick="showTab('savings',this)">Fire Fund & Deposit</div>
+    <div class="tab" onclick="showTab('networth',this)">Net Worth</div>
+    <div class="tab" onclick="showTab('windfalls',this)">Windfalls</div>
+    <div class="tab" onclick="showTab('checklist',this)">Checklist</div>
+  </div>
+
+  <!-- ════════════ DASHBOARD ════════════ -->
+  <div class="panel active" id="panel-dashboard">
+    <div class="month-nav">
+      <button class="mn-btn" onclick="changeMonth(-1)">← prev</button>
+      <div class="mn-label" id="mnLabel">—</div>
+      <button class="mn-btn" onclick="changeMonth(1)">next →</button>
+      <div class="mn-note" id="mnPhase"></div>
+    </div>
+    <div class="sec-head"><h2>Dashboard</h2><div class="phase-badge" id="dashPhase">Phase 1 — Survive the Move</div></div>
+    <div class="grid4" style="margin-bottom:12px">
+      <div class="card brass-accent"><div class="c-label">Liam take-home</div><div class="c-value" style="color:var(--liam);font-size:1.2rem">$7,679</div><div class="c-sub">monthly · 14th</div></div>
+      <div class="card brass-accent"><div class="c-label">Jacynta take-home</div><div class="c-value" style="color:var(--jacynta);font-size:1.2rem">$1,880</div><div class="c-sub">fortnightly · ~$4,073/mo</div></div>
+      <div class="card brass-accent"><div class="c-label">Combined monthly</div><div class="c-value" style="color:var(--brass);font-size:1.2rem">$11,752</div><div class="c-sub">conservative · 65/35</div></div>
+      <div class="card brass-accent"><div class="c-label">Interest burn</div><div class="c-value" style="color:var(--danger);font-size:1.2rem" id="dInterest">$473</div><div class="c-sub">per month to lenders</div></div>
+    </div>
+    <div class="grid2" style="margin-bottom:12px">
+      <div class="card">
+        <div class="c-label">Consumer debt</div>
+        <div class="c-value" style="color:var(--danger)" id="dDebt">$27,475</div>
+        <div class="prog-wrap">
+          <div class="prog-label"><span>payoff progress</span><span>Early 2029</span></div>
+          <div class="prog-track"><div class="prog-fill" id="dDebtProg" style="width:0%;background:var(--danger)"></div></div>
+        </div>
+        <div class="c-sub" style="margin-top:6px">$1,559/month combined · Liam $1,180 + Jac $379</div>
+      </div>
+      <div class="card">
+        <div class="c-label">ATO debts — clears July 2026</div>
+        <div class="c-value" style="color:var(--warn)">$11,801</div>
+        <div class="prog-wrap">
+          <div class="prog-label"><span>clears at FY26 return</span><span>July 2026</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:0%;background:var(--warn)"></div></div>
+        </div>
+        <div class="c-sub" style="margin-top:6px">HELP $2,225 + SSL $7,039 + overdue tax $2,537 · call ATO 13 28 61</div>
+      </div>
+    </div>
+    <div class="grid3" style="margin-bottom:12px">
+      <div class="card sage-accent">
+        <div class="c-label">Fire Fund</div>
+        <div class="c-value" style="font-size:1.2rem" id="dFire" >$0</div>
+        <div class="prog-wrap">
+          <div class="prog-label"><span>3-month target</span><span>$16,165</span></div>
+          <div class="prog-track"><div class="prog-fill" id="dFireProg" style="width:0%;background:var(--sage)"></div></div>
+        </div>
+        <div class="c-sub">Defence Bank 4%+ · open this week</div>
+      </div>
+      <div class="card sage-accent">
+        <div class="c-label">Wedding Fund</div>
+        <div class="c-value" style="font-size:1.2rem" id="dWedding">$0</div>
+        <div class="prog-wrap">
+          <div class="prog-label"><span>Oct target $11,955</span><span id="dWedPct">0%</span></div>
+          <div class="prog-track"><div class="prog-fill" id="dWedProg" style="width:0%;background:var(--rose)"></div></div>
+        </div>
+        <div class="c-sub">November 2026 · $2,500/month needed</div>
+      </div>
+      <div class="card sage-accent">
+        <div class="c-label">House Deposit</div>
+        <div class="c-value" style="font-size:1.2rem" id="dDeposit">$0</div>
+        <div class="prog-wrap">
+          <div class="prog-label"><span>target $100K</span><span id="dDepPct">0%</span></div>
+          <div class="prog-track"><div class="prog-fill" id="dDepProg" style="width:0%;background:var(--slate)"></div></div>
+        </div>
+        <div class="c-sub">Defence Bank 4%+ · Phase 3</div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="c-label" style="margin-bottom:10px">Move bridge — April/May 2026</div>
+        <div class="stat-row"><span class="sr-label">Liam everyday (confirmed)</span><span class="sr-value" style="color:var(--good)">$1,300</span></div>
+        <div class="stat-row"><span class="sr-label">April bonus (after tax)</span><span class="sr-value" style="color:var(--good)">~$3,373</span></div>
+        <div class="stat-row"><span class="sr-label">Bond refund (~mid-May)</span><span class="sr-value" style="color:var(--good)">$2,800</span></div>
+        <div class="stat-row"><span class="sr-label">Moving cost estimate</span><span class="sr-value" style="color:var(--warn)">$4,000–$6,000</span></div>
+        <div class="stat-row"><span class="sr-label">Bridge available</span><span class="sr-value" style="color:var(--brass)">~$7,473</span></div>
+      </div>
+      <div class="card">
+        <div class="c-label" style="margin-bottom:10px">🔴 This week</div>
+        <div class="stat-row"><span class="sr-label">Call ATO 13 28 61</span><span class="sr-value">GIC remission</span></div>
+        <div class="stat-row"><span class="sr-label">Open Fire Fund — Defence Bank</span><span class="sr-value">Jacynta</span></div>
+        <div class="stat-row"><span class="sr-label">Set up $175/fn debt transfer</span><span class="sr-value">Both</span></div>
+        <div class="stat-row"><span class="sr-label">Get 3 removalist quotes</span><span class="sr-value">This week</span></div>
+        <div class="stat-row"><span class="sr-label">Update 65/35 bank transfers</span><span class="sr-value">Both</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ BUDGET ════════════ -->
+  <div class="panel" id="panel-budget">
+    <div class="month-nav">
+      <button class="mn-btn" onclick="changeMonth(-1)">← prev</button>
+      <div class="mn-label" id="budgetMonthLabel">—</div>
+      <button class="mn-btn" onclick="changeMonth(1)">next →</button>
+    </div>
+    <div class="sec-head"><h2>Budget & Bills</h2><span class="sh-sub">65/35 split · joint bills account</span></div>
+    <div class="grid2" style="margin-bottom:16px">
+      <div class="card" style="border-left:3px solid var(--liam)">
+        <div class="c-label">Liam · paid 14th monthly</div>
+        <div class="c-value" style="color:var(--liam);font-size:1.1rem">$2,820</div>
+        <div class="c-sub" style="margin-bottom:10px">transfer to joint bills on the 14th</div>
+        <div id="liamPayRows"></div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--jacynta)">
+        <div class="c-label">Jacynta · fortnightly wednesdays</div>
+        <div class="c-value" style="color:var(--jacynta);font-size:1.1rem">$658</div>
+        <div class="c-sub" style="margin-bottom:10px">per fortnight · ~$1,316/month across 2 pays</div>
+        <div id="jacyntaPayRows"></div>
+      </div>
+    </div>
+    <div class="bills-table">
+      <div class="bt-head"><span>Bill</span><span>Monthly</span><span>Liam 65%</span><span>Jac 35%</span><span>Status</span></div>
+      <div id="billsRows"></div>
+      <div class="bt-total">
+        <span style="font-size:0.6rem;color:var(--text-dim)">Monthly total</span>
+        <span class="btt-v">$4,338</span>
+        <span class="btt-v" style="color:var(--liam)">$2,820</span>
+        <span class="btt-v" style="color:var(--jacynta)">$1,518</span>
+        <span></span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="grid4">
+      <div class="card"><div class="c-label">Liam transferred</div><div class="c-value" style="font-size:1.1rem;color:var(--liam)" id="bLiamIn">$0</div><div class="c-sub">of $2,820</div></div>
+      <div class="card"><div class="c-label">Jacynta transferred</div><div class="c-value" style="font-size:1.1rem;color:var(--jacynta)" id="bJacIn">$0</div><div class="c-sub">of $1,518 (2 pays)</div></div>
+      <div class="card"><div class="c-label">Bills paid out</div><div class="c-value" style="font-size:1.1rem" id="bOut">$0</div><div class="c-sub">of $4,338</div></div>
+      <div class="card"><div class="c-label">Account balance</div><div class="c-value" style="font-size:1.1rem" id="bBal">$0</div><div class="c-sub" id="bBalSub">awaiting transfers</div></div>
+    </div>
+  </div>
+
+  <!-- ════════════ DEBT ════════════ -->
+  <div class="panel" id="panel-debt">
+    <div class="sec-head"><h2>Debt Tracker</h2><span class="sh-sub">avalanche · $1,559/month combined</span></div>
+    <div class="grid4" style="margin-bottom:16px">
+      <div class="card rose-accent"><div class="c-label">Total debt</div><div class="c-value" style="color:var(--danger);font-size:1.2rem" id="debtTotal">$27,475</div><div class="c-sub">4 consumer debts</div></div>
+      <div class="card rose-accent"><div class="c-label">Monthly interest</div><div class="c-value" style="color:var(--warn);font-size:1.2rem" id="debtInterest">$473</div><div class="c-sub">$5,676/year</div></div>
+      <div class="card rose-accent"><div class="c-label">Combined attack</div><div class="c-value" style="font-size:1.2rem">$1,559</div><div class="c-sub">Liam $1,180 + Jac $379</div></div>
+      <div class="card rose-accent"><div class="c-label">Debt-free</div><div class="c-value" style="color:var(--good);font-size:1.2rem">Early 2029</div><div class="c-sub">~35 months</div></div>
+    </div>
+
+    <!-- Live balance inputs -->
+    <div class="note" style="margin-bottom:14px"><strong>Update balances monthly</strong> after each statement to track real progress. Interest and payoff dates auto-calculate.</div>
+    <div class="grid4" style="margin-bottom:16px">
+      <div class="field-group"><div class="field-label">Personal Loan balance</div><input class="field-input" type="number" id="d1bal" placeholder="2650" oninput="saveDebtBal(0,this.value)"></div>
+      <div class="field-group"><div class="field-label">Zip Money balance</div><input class="field-input" type="number" id="d2bal" placeholder="2950" oninput="saveDebtBal(1,this.value)"></div>
+      <div class="field-group"><div class="field-label">Credit Card 2 balance</div><input class="field-input" type="number" id="d3bal" placeholder="6950" oninput="saveDebtBal(2,this.value)"></div>
+      <div class="field-group"><div class="field-label">Credit Card 1 balance</div><input class="field-input" type="number" id="d4bal" placeholder="14925" oninput="saveDebtBal(3,this.value)"></div>
+    </div>
+
+    <div class="debt-card" style="border-left-color:#c86060">
+      <div class="dc-top">
+        <div class="dc-badge" style="background:#3a1515;color:#c86060;border:1px solid #c86060">1</div>
+        <div><div class="dc-name">Personal Loan</div><div class="dc-sub">Current #1 — all acceleration here</div></div>
+        <div><div class="dc-bal" style="color:#c86060" id="dc1bal">$2,650</div><div class="dc-rate">20.45% p.a.</div></div>
+      </div>
+      <div class="prog-track" style="margin-bottom:10px"><div class="prog-fill" id="dc1prog" style="width:0%;background:#c86060"></div></div>
+      <div class="dc-stats">
+        <div class="dc-stat"><div class="dcs-label">Liam payment</div><div class="dcs-val">$400/mo</div></div>
+        <div class="dc-stat"><div class="dcs-label">Jac accel</div><div class="dcs-val">$379/mo</div></div>
+        <div class="dc-stat"><div class="dcs-label">Monthly interest</div><div class="dcs-val" id="dc1int">~$45</div></div>
+        <div class="dc-stat"><div class="dcs-label">Clears</div><div class="dcs-val accent">Oct 2026</div></div>
+      </div>
+    </div>
+    <div class="rollup">$400 rolls → Zip Money · attack becomes <span>$859/month</span></div>
+    <div class="debt-card" style="border-left-color:#c89040">
+      <div class="dc-top">
+        <div class="dc-badge" style="background:#3a2510;color:#c89040;border:1px solid #c89040">2</div>
+        <div><div class="dc-name">Zip Money</div><div class="dc-sub">Highest rate — destroyed by roll-up</div></div>
+        <div><div class="dc-bal" style="color:#c89040" id="dc2bal">$2,950</div><div class="dc-rate">25.9% + $9.95 fee</div></div>
+      </div>
+      <div class="prog-track" style="margin-bottom:10px"><div class="prog-fill" id="dc2prog" style="width:0%;background:#c89040"></div></div>
+      <div class="dc-stats">
+        <div class="dc-stat"><div class="dcs-label">Min payment</div><div class="dcs-val">$80/mo</div></div>
+        <div class="dc-stat"><div class="dcs-label">After roll-up</div><div class="dcs-val">$859/mo</div></div>
+        <div class="dc-stat"><div class="dcs-label">Monthly interest</div><div class="dcs-val" id="dc2int">~$74</div></div>
+        <div class="dc-stat"><div class="dcs-label">Clears</div><div class="dcs-val accent">Feb 2027</div></div>
+      </div>
+    </div>
+    <div class="rollup">$480 rolls → Credit Card 2 · attack becomes <span>$1,259/month</span></div>
+    <div class="debt-card" style="border-left-color:#c8c040">
+      <div class="dc-top">
+        <div class="dc-badge" style="background:#303010;color:#c8c040;border:1px solid #c8c040">3</div>
+        <div><div class="dc-name">Credit Card 2</div><div class="dc-sub">Mid-tier — gone under a year with roll-up</div></div>
+        <div><div class="dc-bal" style="color:#c8c040" id="dc3bal">$6,950</div><div class="dc-rate">20.0% p.a.</div></div>
+      </div>
+      <div class="prog-track" style="margin-bottom:10px"><div class="prog-fill" id="dc3prog" style="width:0%;background:#c8c040"></div></div>
+      <div class="dc-stats">
+        <div class="dc-stat"><div class="dcs-label">Min payment</div><div class="dcs-val">$400/mo</div></div>
+        <div class="dc-stat"><div class="dcs-label">After roll-up</div><div class="dcs-val">$1,259/mo</div></div>
+        <div class="dc-stat"><div class="dcs-label">Monthly interest</div><div class="dcs-val" id="dc3int">~$116</div></div>
+        <div class="dc-stat"><div class="dcs-label">Clears</div><div class="dcs-val accent">Nov 2027</div></div>
+      </div>
+    </div>
+    <div class="rollup">$880 rolls → Credit Card 1 · full firepower <span>$1,559/month</span></div>
+    <div class="debt-card" style="border-left-color:#60aa70">
+      <div class="dc-top">
+        <div class="dc-badge" style="background:#102810;color:#60aa70;border:1px solid #60aa70">4</div>
+        <div><div class="dc-name">Credit Card 1</div><div class="dc-sub">The big one — full firepower hits last</div></div>
+        <div><div class="dc-bal" style="color:#60aa70" id="dc4bal">$14,925</div><div class="dc-rate">19.99% p.a.</div></div>
+      </div>
+      <div class="prog-track" style="margin-bottom:10px"><div class="prog-fill" id="dc4prog" style="width:0%;background:#60aa70"></div></div>
+      <div class="dc-stats">
+        <div class="dc-stat"><div class="dcs-label">Min payment</div><div class="dcs-val">$300/mo</div></div>
+        <div class="dc-stat"><div class="dcs-label">After roll-up</div><div class="dcs-val">$1,559/mo</div></div>
+        <div class="dc-stat"><div class="dcs-label">Monthly interest</div><div class="dcs-val" id="dc4int">~$249</div></div>
+        <div class="dc-stat"><div class="dcs-label">Clears</div><div class="dcs-val accent">Early 2029</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ WEDDING ════════════ -->
+  <div class="panel" id="panel-wedding">
+    <div class="sec-head"><h2>Wedding</h2><span class="sh-sub">November 2026 · no ceiling · track as we go</span></div>
+    <div class="grid4" style="margin-bottom:16px">
+      <div class="card"><div class="c-label">Confirmed vendors</div><div class="c-value" style="color:var(--brass);font-size:1.1rem">$16,850</div><div class="c-sub">6 vendors booked</div></div>
+      <div class="card"><div class="c-label">Already paid</div><div class="c-value" style="color:var(--good);font-size:1.1rem">$2,420</div><div class="c-sub">from joint account</div></div>
+      <div class="card"><div class="c-label">Still owing (confirmed)</div><div class="c-value" style="color:var(--danger);font-size:1.1rem">$14,430</div><div class="c-sub">across 6 vendors</div></div>
+      <div class="card"><div class="c-label">Wedding fund</div><div class="c-value" style="color:var(--danger);font-size:1.1rem" id="wfDisplay">$0</div><div class="c-sub" id="wfSub">open account this week</div></div>
+    </div>
+    <div class="field-group" style="max-width:200px;margin-bottom:16px">
+      <div class="field-label">Update wedding fund balance</div>
+      <input class="field-input" type="number" placeholder="0" id="wfInput" oninput="saveVal('weddingFund',this.value)">
+    </div>
+    <div class="prog-wrap" style="margin-bottom:16px">
+      <div class="prog-label"><span>Progress to October target ($11,955)</span><span id="wfPct">0%</span></div>
+      <div class="prog-track" style="height:7px"><div class="prog-fill" id="wfProg" style="width:0%;background:var(--rose)"></div></div>
+    </div>
+    <div class="sec-label">Confirmed payment schedule</div>
+    <div class="wt-row"><div><div class="wtr-vendor">Little Weddings — instalment 1</div></div><div class="wtr-date">20 May 2026</div><div class="wtr-amt">$580</div></div>
+    <div class="wt-row"><div><div class="wtr-vendor">Little Weddings — instalment 2</div></div><div class="wtr-date">20 Aug 2026</div><div class="wtr-amt">$1,385</div></div>
+    <div class="wt-row"><div><div class="wtr-vendor">Art by Grace — painting</div></div><div class="wtr-date">20 Oct 2026</div><div class="wtr-amt">$1,080</div></div>
+    <div class="wt-row crunch"><div><div class="wtr-vendor" style="color:var(--warn)">⚠️ November crunch — $10,385 due</div><div class="wtr-date" style="font-size:0.56rem;color:var(--text-dim);margin-top:3px">LW $1,385 · BC Films $1,700 · Photography $1,800 · Venue $5,500</div></div><div class="wtr-date">Nov 2026</div><div class="wtr-amt" style="color:var(--warn)">$10,385</div></div>
+    <div class="wt-row"><div><div class="wtr-vendor">Bill Olson Music</div></div><div class="wtr-date">Wedding day · cash</div><div class="wtr-amt">$1,000</div></div>
+    <div class="divider"></div>
+    <div class="sec-label">Fund projection — $2,500/month from May</div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px">
+      <div class="proj-row header"><span>Month</span><span>Top-up</span><span>Out</span><span class="pr-note">Balance</span></div>
+      <div class="proj-row"><span>May</span><span style="color:var(--good)">+$2,500</span><span style="color:var(--danger)">−$580</span><span class="pr-bal pr-note">$1,920</span></div>
+      <div class="proj-row"><span>June</span><span style="color:var(--good)">+$2,500</span><span>—</span><span class="pr-bal pr-note">$4,420</span></div>
+      <div class="proj-row"><span>July</span><span style="color:var(--good)">+$2,500</span><span>—</span><span class="pr-bal pr-note">$6,920</span></div>
+      <div class="proj-row"><span>August</span><span style="color:var(--good)">+$2,500</span><span style="color:var(--danger)">−$1,385</span><span class="pr-bal pr-note">$8,035</span></div>
+      <div class="proj-row"><span>September</span><span style="color:var(--good)">+$2,500</span><span>—</span><span class="pr-bal pr-note">$10,535</span></div>
+      <div class="proj-row crunch"><span>October</span><span style="color:var(--good)">+$2,500</span><span style="color:var(--danger)">−$1,080</span><span class="pr-bal pr-note" style="color:var(--warn)">$11,955 ⚠️</span></div>
+    </div>
+    <div class="sec-label">Still to book</div>
+    <div class="grid3">
+      <div class="card"><div class="c-label">Dress / Suits</div><div style="font-size:0.8rem;color:var(--text-mid);font-family:'Playfair Display',serif">$1,500–$3,000</div></div>
+      <div class="card"><div class="c-label">Floristry</div><div style="font-size:0.8rem;color:var(--text-mid);font-family:'Playfair Display',serif">$800–$2,000</div></div>
+      <div class="card"><div class="c-label">Hair & Makeup</div><div style="font-size:0.8rem;color:var(--text-mid);font-family:'Playfair Display',serif">$500–$1,200</div></div>
+      <div class="card"><div class="c-label">Cake</div><div style="font-size:0.8rem;color:var(--text-mid);font-family:'Playfair Display',serif">$400–$800</div></div>
+      <div class="card"><div class="c-label">Rings</div><div style="font-size:0.8rem;color:var(--text-mid);font-family:'Playfair Display',serif">$1,000–$3,000</div></div>
+      <div class="card"><div class="c-label">Transport</div><div style="font-size:0.8rem;color:var(--text-mid);font-family:'Playfair Display',serif">$400–$800</div></div>
+    </div>
+  </div>
+
+  <!-- ════════════ SAVINGS ════════════ -->
+  <div class="panel" id="panel-savings">
+    <div class="sec-head"><h2>Fire Fund & House Deposit</h2><span class="sh-sub">Defence Bank staff savings · 4%+</span></div>
+    <div class="grid2" style="margin-bottom:16px">
+      <div class="card sage-accent">
+        <div class="c-label">Fire Fund — Emergency Only</div>
+        <div class="c-value" style="color:var(--danger)" id="ffDisplay">$0</div>
+        <div class="field-group" style="margin:10px 0 8px"><div class="field-label">Update balance</div><input class="field-input" type="number" placeholder="0" id="ffInput" oninput="saveVal('fireFund',this.value)"></div>
+        <div class="prog-wrap"><div class="prog-label"><span>3-month target</span><span>$16,165</span></div><div class="prog-track"><div class="prog-fill" id="ffProg3" style="width:0%;background:var(--sage)"></div></div></div>
+        <div class="prog-wrap"><div class="prog-label"><span>6-month target</span><span>$32,329</span></div><div class="prog-track"><div class="prog-fill" id="ffProg6" style="width:0%;background:var(--sage);opacity:0.5"></div></div></div>
+        <div class="divider"></div>
+        <div class="stat-row"><span class="sr-label">Phase floor (1 & 2)</span><span class="sr-value" style="color:var(--warn)">$2,000–$3,000</span></div>
+        <div class="stat-row"><span class="sr-label">Interest at 4%</span><span class="sr-value" style="color:var(--good)">~$647/yr at target</span></div>
+        <div class="stat-row"><span class="sr-label">Where held</span><span class="sr-value" style="color:var(--sage)">Defence Bank 4%+</span></div>
+      </div>
+      <div class="card slate-accent">
+        <div class="c-label">House Deposit</div>
+        <div class="c-value" style="color:var(--danger)" id="hdDisplay">$0</div>
+        <div class="field-group" style="margin:10px 0 8px"><div class="field-label">Update balance</div><input class="field-input" type="number" placeholder="0" id="hdInput" oninput="saveVal('houseDeposit',this.value)"></div>
+        <div class="prog-wrap"><div class="prog-label"><span>target $100K</span><span id="hdPct100">0%</span></div><div class="prog-track"><div class="prog-fill" id="hdProg100" style="width:0%;background:var(--slate)"></div></div></div>
+        <div class="prog-wrap"><div class="prog-label"><span>target $150K</span><span id="hdPct150">0%</span></div><div class="prog-track"><div class="prog-fill" id="hdProg150" style="width:0%;background:var(--slate);opacity:0.5"></div></div></div>
+        <div class="divider"></div>
+        <div class="stat-row"><span class="sr-label">Target year</span><span class="sr-value">2031–2032</span></div>
+        <div class="stat-row"><span class="sr-label">Status</span><span class="sr-value" style="color:var(--warn)">Paused — Phase 1 & 2</span></div>
+        <div class="stat-row"><span class="sr-label">Staff mortgage</span><span class="sr-value" style="color:var(--sage)">Investigate Phase 4</span></div>
+        <div class="stat-row"><span class="sr-label">Where held</span><span class="sr-value" style="color:var(--slate)">Defence Bank 4%+</span></div>
+      </div>
+    </div>
+    <div class="note"><strong>Critical fix:</strong> Two separate auto-transfers on Liam's pay day — first $1,180 to the Debt Repayment Account, then Fire Fund contribution to Defence Bank. These must be at different banks. Never manual, never combined.</div>
+  </div>
+
+  <!-- ════════════ NET WORTH ════════════ -->
+  <div class="panel" id="panel-networth">
+    <div class="sec-head"><h2>Net Worth</h2><span class="sh-sub">update quarterly · last updated March 2026</span></div>
+    <div class="grid2">
+      <div class="card">
+        <div class="nw-head">Assets</div>
+        <div class="nw-row"><span class="nwr-l">Liam super (AustralianSuper)</span><span class="nwr-r pos">$60K–$100K</span></div>
+        <div class="nw-row"><span class="nwr-l">Jacynta super (HESTA)</span><span class="nwr-r pos">$30K–$60K</span></div>
+        <div class="nw-row"><span class="nwr-l">Liam — Pearler (VOO)</span><span class="nwr-r pos">&lt;$5K</span></div>
+        <div class="nw-row"><span class="nwr-l">Jacynta — Pearler (VOO)</span><span class="nwr-r pos">&lt;$5K</span></div>
+        <div class="nw-row"><span class="nwr-l">Fire Fund</span><span class="nwr-r pos" id="nwFF">$0</span></div>
+        <div class="nw-row"><span class="nwr-l">House Deposit</span><span class="nwr-r pos" id="nwHD">$0</span></div>
+        <div class="nw-row"><span class="nwr-l">Wedding Fund</span><span class="nwr-r pos" id="nwWF">$0</span></div>
+        <div class="nw-total"><span class="nwt-l">Total assets (est.)</span><span class="nwt-r pos">$90K–$170K+</span></div>
+      </div>
+      <div class="card">
+        <div class="nw-head">Liabilities</div>
+        <div class="nw-row"><span class="nwr-l">Personal Loan</span><span class="nwr-r neg" id="nwD1">$2,650</span></div>
+        <div class="nw-row"><span class="nwr-l">Zip Money</span><span class="nwr-r neg" id="nwD2">$2,950</span></div>
+        <div class="nw-row"><span class="nwr-l">Credit Card 2</span><span class="nwr-r neg" id="nwD3">$6,950</span></div>
+        <div class="nw-row"><span class="nwr-l">Credit Card 1</span><span class="nwr-r neg" id="nwD4">$14,925</span></div>
+        <div class="nw-row"><span class="nwr-l">ATO — Income Tax</span><span class="nwr-r neg">$2,537</span></div>
+        <div class="nw-row"><span class="nwr-l">ATO — HELP</span><span class="nwr-r neg">$2,225</span></div>
+        <div class="nw-row"><span class="nwr-l">ATO — SSL</span><span class="nwr-r neg">$7,039</span></div>
+        <div class="nw-total"><span class="nwt-l">Total liabilities</span><span class="nwt-r neg" id="nwTotalLiab">$39,276</span></div>
+        <div class="divider"></div>
+        <div class="nw-total" style="padding-top:0"><span class="nwt-l">Est. net worth</span><span class="nwt-r pos">$50K–$130K+</span></div>
+        <div style="font-size:0.58rem;color:var(--text-dim);margin-top:8px;line-height:1.6">Every debt cleared shifts net worth by its full balance. $27,475 improvement in one go at Early 2029.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ WINDFALLS ════════════ -->
+  <div class="panel" id="panel-windfalls">
+    <div class="sec-head"><h2>Windfalls</h2><span class="sh-sub">all pre-committed · every dollar has a job</span></div>
+    <div class="sec-label">Phase 1 — Survive the Move</div>
+    <div id="wfRows"></div>
+    <div class="sec-label" style="margin-top:16px">Phase 2 — Wedding Mode</div>
+    <div id="wfRows2"></div>
+    <div class="sec-label" style="margin-top:16px">Phase 3 — Debt Assault</div>
+    <div id="wfRows3"></div>
+    <div class="divider"></div>
+    <div class="note"><strong>Rule:</strong> Every windfall has a pre-assigned destination before it lands. Never let a windfall sit in an everyday account — it will be spent within 30 days.</div>
+  </div>
+
+  <!-- ════════════ CHECKLIST ════════════ -->
+  <div class="panel" id="panel-checklist">
+    <div class="month-nav">
+      <button class="mn-btn" onclick="changeMonth(-1)">← prev</button>
+      <div class="mn-label" id="checkMonthLabel">—</div>
+      <button class="mn-btn" onclick="changeMonth(1)">next →</button>
+    </div>
+    <div class="sec-head"><h2>Monthly Checklist</h2><span class="sh-sub">resets each month</span></div>
+    <div class="prog-wrap" style="margin-bottom:16px">
+      <div class="prog-label"><span>Complete</span><span id="checkPct">0%</span></div>
+      <div class="prog-track" style="height:6px"><div class="prog-fill" id="checkFill" style="width:0%;background:var(--good)"></div></div>
+    </div>
+    <div id="checklistEl"></div>
+  </div>
+
+</div><!-- end #app -->
+
+<script>
+// ════════════════════════════════════════
+// SUPABASE CONFIG — replace with your own
+// ════════════════════════════════════════
+const SUPABASE_URL = '__SUPABASE_URL__';
+const SUPABASE_ANON_KEY = '__SUPABASE_ANON_KEY__';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── STATIC DATA ──
+const BILLS = [
+  {name:'Rent',sub:'$1,400/fn · moving end April',amt:3033},
+  {name:'Electricity',sub:'⚠️ compare providers urgently',amt:600},
+  {name:'Gas',sub:'',amt:100},
+  {name:'Internet',sub:'',amt:109},
+  {name:'Health Insurance',sub:'Joint policy',amt:121},
+  {name:'Jacynta Phone',sub:'Device + plan bundled',amt:145},
+  {name:'Liam Phone',sub:'',amt:40},
+  {name:'Gym',sub:'2 × $21.95/week',amt:190.23},
+];
+
+const DEBT_RATES = [0.2045, 0.259, 0.20, 0.1999];
+const DEBT_STARTING = [2650, 2950, 6950, 14925];
+
+const WINDFALLS = [
+  [{id:'wf_apr_bonus',label:'April Bonus (Liam)',sub:'$3,000 → moving costs · $373 → Zip Money',amt:'~$3,373'},
+   {id:'wf_bond',label:'Bond Refund',sub:'~mid-May → Zip Money · clears it entirely',amt:'$2,800'}],
+  [{id:'wf_jac_bonus1',label:'Jacynta Bonus Pay #1',sub:'→ wedding fund immediately',amt:'~$1,880'},
+   {id:'wf_jac_bonus2',label:'Jacynta Bonus Pay #2',sub:'→ wedding fund',amt:'~$1,880'},
+   {id:'wf_jac_eofy',label:'Jacynta EOFY Refund',sub:'→ wedding fund',amt:'TBC'},
+   {id:'wf_hecs',label:'HECS/SSL Freed — August 2026',sub:"Will feel like a pay rise. It is not. Pre-commit all $840.",amt:'~$840/mo'}],
+  [{id:'wf_jac_rise',label:'Jacynta Pay Rise (pending)',sub:'Pre-commit entire increase to debt',amt:'TBC'},
+   {id:'wf_liam_eofy',label:'Liam EOFY Refund',sub:'~$0–$500 net after ATO offset → debt',amt:'~$0–$500'}],
+];
+
+const CHECKLIST_ITEMS = [
+  {section:'🔴 This Week',items:[
+    {id:'c_ato',text:'Call ATO 13 28 61 — request GIC remission on $2,537',owner:'Liam'},
+    {id:'c_fire',text:'Open Fire Fund at Defence Bank staff savings (4%+)',owner:'Jacynta'},
+    {id:'c_deposit',text:'Open House Deposit at Defence Bank staff savings (4%+)',owner:'Jacynta'},
+    {id:'c_jac_transfer',text:'Set up Jacynta $175/fn auto debt acceleration transfer',owner:'Both'},
+    {id:'c_split',text:'Update joint account transfers to 65/35 split',owner:'Both'},
+    {id:'c_removal',text:'Get 3 removalist quotes — book early',owner:'Both'},
+    {id:'c_bond',text:'Confirm bond refund process with property manager',owner:'Both'},
+  ]},
+  {section:'📅 Monthly',items:[
+    {id:'c_bills',text:'All bills paid — check joint bills account',owner:'Both'},
+    {id:'c_debt_bal',text:'Update all debt balances — note interest charged',owner:'Liam'},
+    {id:'c_fire_bal',text:'Record Fire Fund balance — above phase floor?',owner:'Both'},
+    {id:'c_wed_bal',text:'Record wedding fund balance — on track?',owner:'Both'},
+    {id:'c_var',text:'Review variable spending vs $1,050 budget',owner:'Both'},
+    {id:'c_jac_confirm',text:'Confirm Jacynta debt acceleration transfer went through',owner:'Jacynta'},
+    {id:'c_windfalls',text:'Note any windfalls — confirm pre-committed destination',owner:'Both'},
+  ]},
+  {section:'🟠 This Month',items:[
+    {id:'c_transport',text:'Confirm Jacynta transport costs (rego, insurance, fuel)',owner:'Jacynta'},
+    {id:'c_elec',text:'Compare electricity providers — $600/month is very high',owner:'Both'},
+    {id:'c_super_ins',text:'Check super insurance — AustralianSuper and HESTA',owner:'Both'},
+    {id:'c_super_ben',text:'Update super beneficiary nominations — both funds',owner:'Both'},
+  ]},
+  {section:'🟡 Quarterly',items:[
+    {id:'c_phone',text:'Note Jacynta phone contract end — plan SIM-only switch',owner:'Jacynta'},
+    {id:'c_nw',text:'Update net worth snapshot with real figures',owner:'Both'},
+    {id:'c_wills',text:'Get wills done before November wedding',owner:'Both'},
+  ]},
+];
+
+// ── STATE ──
+let currentMonth = new Date().getMonth();
+let currentYear  = new Date().getFullYear();
+let appState = {}; // loaded from Supabase
+let currentUser = null;
+let isSignUp = false;
+let saveTimeout = null;
+
+// ── AUTH ──
+async function handleAuth() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPassword').value;
+  const btn   = document.getElementById('authBtn');
+  const err   = document.getElementById('loginErr');
+  err.textContent = '';
+  btn.textContent = isSignUp ? 'Creating account...' : 'Signing in...';
+  btn.disabled = true;
+
+  let result;
+  if (isSignUp) {
+    result = await sb.auth.signUp({email,password:pass});
+  } else {
+    result = await sb.auth.signInWithPassword({email,password:pass});
+  }
+
+  if (result.error) {
+    err.textContent = result.error.message;
+    btn.textContent = isSignUp ? 'Create Account' : 'Sign In';
+    btn.disabled = false;
+  } else {
+    if (isSignUp && !result.data.session) {
+      err.style.color = 'var(--good)';
+      err.textContent = 'Check your email to confirm your account, then sign in.';
+      btn.textContent = 'Sign In';
+      btn.disabled = false;
+      isSignUp = false;
+      updateAuthUI();
+    }
+  }
+}
+
+function toggleAuthMode() {
+  isSignUp = !isSignUp;
+  updateAuthUI();
+}
+
+function updateAuthUI() {
+  document.getElementById('authBtn').textContent = isSignUp ? 'Create Account' : 'Sign In';
+  document.getElementById('authToggle').innerHTML = isSignUp
+    ? 'Already have an account? <span>Sign in</span>'
+    : 'No account? <span>Create one</span>';
+}
+
+async function signOut() {
+  await sb.auth.signOut();
+}
+
+// ── SESSION ──
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (session) {
+    currentUser = session.user;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('hudUserEmail').textContent = session.user.email.split('@')[0];
+    await loadState();
+    initApp();
+  } else {
+    currentUser = null;
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  }
+});
+
+// ── SUPABASE STATE ──
+async function loadState() {
+  setSyncStatus('syncing');
+  const {data, error} = await sb
+    .from('finance_state')
+    .select('state')
+    .eq('user_id', currentUser.id)
+    .single();
+
+  if (data) {
+    appState = data.state || {};
+  } else {
+    appState = {};
+  }
+  setSyncStatus('synced');
+}
+
+async function saveState() {
+  setSyncStatus('syncing');
+  const {error} = await sb
+    .from('finance_state')
+    .upsert({user_id: currentUser.id, state: appState, updated_at: new Date().toISOString()}, {onConflict:'user_id'});
+
+  setSyncStatus(error ? 'error' : 'synced');
+}
+
+function debounceSave() {
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(saveState, 800);
+}
+
+function setSyncStatus(status) {
+  const dot = document.getElementById('syncDot');
+  dot.className = 'sync-dot ' + status;
+}
+
+// ── HELPERS ──
+function monthKey() { return `${currentYear}-${String(currentMonth+1).padStart(2,'0')}`; }
+function getMonthState(key) {
+  if (!appState.months) appState.months = {};
+  if (!appState.months[monthKey()]) appState.months[monthKey()] = {};
+  return appState.months[monthKey()][key] || {};
+}
+function setMonthState(key, val) {
+  if (!appState.months) appState.months = {};
+  if (!appState.months[monthKey()]) appState.months[monthKey()] = {};
+  appState.months[monthKey()][key] = val;
+  debounceSave();
+}
+
+function saveVal(key, raw) {
+  const val = parseFloat(raw)||0;
+  if (!appState.global) appState.global = {};
+  appState.global[key] = val;
+  debounceSave();
+  refreshGlobalDisplays();
+}
+
+function saveDebtBal(idx, raw) {
+  const val = parseFloat(raw)||0;
+  if (!appState.global) appState.global = {};
+  if (!appState.global.debtBals) appState.global.debtBals = [...DEBT_STARTING];
+  appState.global.debtBals[idx] = val;
+  debounceSave();
+  refreshDebtDisplays();
+}
+
+function g(key, def=0) { return (appState.global && appState.global[key] != null) ? appState.global[key] : def; }
+
+// ── MONTH NAVIGATION ──
+function changeMonth(dir) {
+  currentMonth += dir;
+  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+  if (currentMonth < 0)  { currentMonth = 11; currentYear--; }
+  refreshMonthLabels();
+  renderBudget();
+  renderChecklist();
+}
+
+function refreshMonthLabels() {
+  const d = new Date(currentYear, currentMonth, 1);
+  const label = d.toLocaleDateString('en-AU',{month:'long',year:'numeric'});
+  ['mnLabel','budgetMonthLabel','checkMonthLabel'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.textContent = label;
+  });
+  // phase
+  const phaseText = getPhaseLabel(d);
+  const pb = document.getElementById('dashPhase');
+  if(pb) pb.textContent = phaseText;
+  const mn = document.getElementById('mnPhase');
+  if(mn) mn.textContent = phaseText;
+}
+
+function getPhaseLabel(d) {
+  const t = d.getTime();
+  if (t < new Date(2026,4,1).getTime()) return 'Phase 1 — Survive the Move';
+  if (t < new Date(2026,11,1).getTime()) return 'Phase 2 — Wedding Mode';
+  if (t < new Date(2029,0,1).getTime()) return 'Phase 3 — Debt Assault';
+  return 'Phase 4 — Wealth Building';
+}
+
+// ── JACYNTA PAY DATES ──
+function getJacyntaDates(year, month) {
+  const anchor = new Date(2026,2,11);
+  const first = new Date(year,month,1), last = new Date(year,month+1,0);
+  const dates = [];
+  let d = new Date(anchor);
+  while(d > first) d = new Date(d.getTime()-14*86400000);
+  while(d <= last) { if(d >= first) dates.push(new Date(d)); d = new Date(d.getTime()+14*86400000); }
+  return dates;
+}
+function fmtDate(d){ return d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'}); }
+function fmtKey(d){ return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
+
+// ── TABS ──
+function showTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.getElementById('panel-'+id).classList.add('active');
+  if(id==='budget') renderBudget();
+  if(id==='checklist') renderChecklist();
+  if(id==='windfalls') renderWindfalls();
+}
+
+// ── BUDGET ──
+function renderBudget() {
+  const billState = getMonthState('bills');
+  const payState  = getMonthState('pay');
+
+  // Liam
+  document.getElementById('liamPayRows').innerHTML = `
+    <div class="pay-row" onclick="togglePay('liam_14')">
+      <div class="pr-date">14th — monthly</div>
+      <div class="pr-amt" style="color:var(--liam)">$2,820</div>
+      <div class="pr-status ${payState['liam_14']?'done':'pend'}">${payState['liam_14']?'✓ done':'pending'}</div>
+    </div>`;
+
+  // Jacynta
+  const jDates = getJacyntaDates(currentYear, currentMonth);
+  document.getElementById('jacyntaPayRows').innerHTML = jDates.map(d=>{
+    const k = 'jac_'+fmtKey(d);
+    const done = !!payState[k];
+    return `<div class="pay-row" onclick="togglePay('${k}')">
+      <div class="pr-date">${fmtDate(d)}</div>
+      <div class="pr-amt" style="color:var(--jacynta)">$658</div>
+      <div class="pr-status ${done?'done':'pend'}">${done?'✓ done':'pending'}</div>
+    </div>`;
+  }).join('');
+
+  // Bills
+  document.getElementById('billsRows').innerHTML = BILLS.map((b,i)=>{
+    const paid = !!billState[i];
+    return `<div class="bt-row">
+      <div><div class="btr-name">${b.name}</div>${b.sub?`<div class="btr-sub">${b.sub}</div>`:''}</div>
+      <div class="btr-amt">$${Math.round(b.amt).toLocaleString('en-AU')}</div>
+      <div class="btr-liam">$${Math.round(b.amt*0.65).toLocaleString('en-AU')}</div>
+      <div class="btr-jac">$${Math.round(b.amt*0.35).toLocaleString('en-AU')}</div>
+      <div class="tog ${paid?'on':''}" onclick="toggleBill(${i})">
+        <div class="tog-box ${paid?'on':''}">${paid?'✓':''}</div>
+        <div class="tog-label">${paid?'paid':'unpaid'}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Totals
+  const liamIn  = payState['liam_14'] ? 2820 : 0;
+  const jacIn   = jDates.filter(d=>payState['jac_'+fmtKey(d)]).length * 658;
+  const paidOut = BILLS.filter((_,i)=>billState[i]).reduce((s,b)=>s+b.amt,0);
+  const bal     = liamIn + jacIn - paidOut;
+
+  document.getElementById('bLiamIn').textContent = '$'+liamIn.toLocaleString('en-AU');
+  document.getElementById('bJacIn').textContent  = '$'+jacIn.toLocaleString('en-AU');
+  document.getElementById('bOut').textContent    = '$'+Math.round(paidOut).toLocaleString('en-AU');
+  document.getElementById('bBal').textContent    = (bal<0?'-':'')+'$'+Math.abs(Math.round(bal)).toLocaleString('en-AU');
+  document.getElementById('bBal').style.color    = bal<0?'var(--danger)':'var(--good)';
+  document.getElementById('bBalSub').textContent = bal<0?'⚠️ top up needed':'looking good';
+}
+
+function togglePay(key) {
+  const s = getMonthState('pay');
+  s[key] = !s[key];
+  setMonthState('pay', s);
+  renderBudget();
+}
+
+function toggleBill(i) {
+  const s = getMonthState('bills');
+  s[i] = !s[i];
+  setMonthState('bills', s);
+  renderBudget();
+}
+
+// ── DEBT ──
+function refreshDebtDisplays() {
+  const bals = (appState.global && appState.global.debtBals) ? appState.global.debtBals : [...DEBT_STARTING];
+  const ids = ['d1bal','d2bal','d3bal','d4bal'];
+  ids.forEach((id,i) => {
+    const el = document.getElementById(id);
+    if(el && el !== document.activeElement) el.value = bals[i] || '';
+  });
+
+  const dcBals = ['dc1bal','dc2bal','dc3bal','dc4bal'];
+  const dcInts = ['dc1int','dc2int','dc3int','dc4int'];
+  const dcProgs = ['dc1prog','dc2prog','dc3prog','dc4prog'];
+
+  bals.forEach((bal,i) => {
+    const b = bal || 0;
+    const start = DEBT_STARTING[i];
+    const interest = Math.round(b * DEBT_RATES[i] / 12);
+    const pct = Math.max(0, Math.round((1 - b/start)*100));
+
+    const balEl = document.getElementById(dcBals[i]);
+    const intEl = document.getElementById(dcInts[i]);
+    const progEl = document.getElementById(dcProgs[i]);
+    if(balEl) balEl.textContent = '$'+b.toLocaleString('en-AU');
+    if(intEl) intEl.textContent = '~$'+interest;
+    if(progEl) progEl.style.width = pct+'%';
+  });
+
+  const total = bals.reduce((s,b)=>s+(b||0),0);
+  const totalInt = bals.reduce((s,b,i)=>s+Math.round((b||0)*DEBT_RATES[i]/12),0);
+  const el1 = document.getElementById('debtTotal'); if(el1) el1.textContent = '$'+Math.round(total).toLocaleString('en-AU');
+  const el2 = document.getElementById('debtInterest'); if(el2) el2.textContent = '$'+totalInt;
+  const el3 = document.getElementById('hudDebt'); if(el3) el3.textContent = '$'+Math.round(total).toLocaleString('en-AU');
+  const el4 = document.getElementById('dDebt'); if(el4) el4.textContent = '$'+Math.round(total).toLocaleString('en-AU');
+  const el5 = document.getElementById('dInterest'); if(el5) el5.textContent = '$'+totalInt;
+
+  // NW debt rows
+  ['nwD1','nwD2','nwD3','nwD4'].forEach((id,i)=>{
+    const el = document.getElementById(id);
+    if(el) el.textContent = '$'+(bals[i]||0).toLocaleString('en-AU');
+  });
+}
+
+// ── GLOBAL DISPLAYS ──
+function refreshGlobalDisplays() {
+  const wf = g('weddingFund');
+  const ff = g('fireFund');
+  const hd = g('houseDeposit');
+
+  // Wedding
+  const wfFmt = '$'+Math.round(wf).toLocaleString('en-AU');
+  ['wfDisplay','dWedding'].forEach(id=>{ const el=document.getElementById(id); if(el){el.textContent=wfFmt; el.style.color=wf>0?'var(--good)':'var(--danger)';} });
+  document.getElementById('hudWedding').textContent = wfFmt;
+  const wfPct = Math.min(100,Math.round(wf/11955*100));
+  ['wfPct','dWedPct'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=wfPct+'%'; });
+  ['wfProg','dWedProg'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.width=wfPct+'%'; });
+  if(wf>0) document.getElementById('wfSub').textContent = `$${Math.round(11955-wf).toLocaleString('en-AU')} to go`;
+
+  // Fire Fund
+  const ffFmt = '$'+Math.round(ff).toLocaleString('en-AU');
+  ['ffDisplay','dFire'].forEach(id=>{ const el=document.getElementById(id); if(el){el.textContent=ffFmt; el.style.color=ff>=2000?'var(--good)':'var(--danger)';} });
+  document.getElementById('hudFire').textContent = ffFmt;
+  document.getElementById('hudFire').style.color = ff>=2000?'var(--good)':'var(--danger)';
+  const ffEl = document.getElementById('ffProg3'); if(ffEl) ffEl.style.width=Math.min(100,ff/16165*100)+'%';
+  const ff6El = document.getElementById('ffProg6'); if(ff6El) ff6El.style.width=Math.min(100,ff/32329*100)+'%';
+  const dFireProg = document.getElementById('dFireProg'); if(dFireProg) dFireProg.style.width=Math.min(100,ff/16165*100)+'%';
+
+  // House deposit
+  const hdFmt = '$'+Math.round(hd).toLocaleString('en-AU');
+  ['hdDisplay','dDeposit'].forEach(id=>{ const el=document.getElementById(id); if(el){el.textContent=hdFmt; el.style.color=hd>0?'var(--good)':'var(--danger)';} });
+  const hdPct100 = Math.min(100,Math.round(hd/100000*100));
+  const hdPct150 = Math.min(100,Math.round(hd/150000*100));
+  ['hdPct100','dDepPct'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=hdPct100+'%'; });
+  document.getElementById('hdPct150').textContent = hdPct150+'%';
+  ['hdProg100','dDepProg'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.width=hdPct100+'%'; });
+  document.getElementById('hdProg150').style.width=hdPct150+'%';
+
+  // Populate inputs without overriding active focus
+  [['ffInput',ff],['hdInput',hd],['wfInput',wf]].forEach(([id,val])=>{
+    const el=document.getElementById(id); if(el && el!==document.activeElement && val) el.value=val;
+  });
+
+  // NW
+  document.getElementById('nwFF').textContent='$'+Math.round(ff).toLocaleString('en-AU');
+  document.getElementById('nwHD').textContent='$'+Math.round(hd).toLocaleString('en-AU');
+  document.getElementById('nwWF').textContent='$'+Math.round(wf).toLocaleString('en-AU');
+}
+
+// ── CHECKLIST ──
+function renderChecklist() {
+  const checkState = getMonthState('checklist');
+  const total = CHECKLIST_ITEMS.reduce((s,sec)=>s+sec.items.length,0);
+  const done  = Object.values(checkState).filter(Boolean).length;
+  const pct   = Math.round(done/total*100);
+  document.getElementById('checkPct').textContent = pct+'%';
+  document.getElementById('checkFill').style.width = pct+'%';
+
+  let html = '';
+  CHECKLIST_ITEMS.forEach(sec=>{
+    html += `<div class="check-sec-label">${sec.section}</div>`;
+    sec.items.forEach(item=>{
+      const isDone = !!checkState[item.id];
+      html += `<div class="check-item ${isDone?'done':''}" onclick="toggleCheck('${item.id}')">
+        <div class="ci-box">${isDone?'✓':''}</div>
+        <div><div class="ci-text">${item.text}</div><div class="ci-owner">${item.owner}</div></div>
+      </div>`;
+    });
+  });
+  document.getElementById('checklistEl').innerHTML = html;
+}
+
+function toggleCheck(id) {
+  const s = getMonthState('checklist');
+  s[id] = !s[id];
+  setMonthState('checklist', s);
+  renderChecklist();
+}
+
+// ── WINDFALLS ──
+function renderWindfalls() {
+  if (!appState.global) appState.global = {};
+  if (!appState.global.windfalls) appState.global.windfalls = {};
+  const wfState = appState.global.windfalls;
+
+  WINDFALLS.forEach((group, gi)=>{
+    const el = document.getElementById(['wfRows','wfRows2','wfRows3'][gi]);
+    if(!el) return;
+    el.innerHTML = group.map(wf=>{
+      const done = !!wfState[wf.id];
+      return `<div class="wf-row">
+        <div><div class="wf-label">${wf.label}</div><div class="wf-sub">${wf.sub}</div></div>
+        <div class="tog ${done?'on':''}" onclick="toggleWindfall('${wf.id}')">
+          <div class="tog-box ${done?'on':''}">${done?'✓':''}</div>
+          <div class="tog-label">${done?'done ✓':'pending'}</div>
+        </div>
+        <div class="wf-amt">${wf.amt}</div>
+      </div>`;
+    }).join('');
+  });
+}
+
+function toggleWindfall(id) {
+  if (!appState.global) appState.global = {};
+  if (!appState.global.windfalls) appState.global.windfalls = {};
+  appState.global.windfalls[id] = !appState.global.windfalls[id];
+  debounceSave();
+  renderWindfalls();
+}
+
+// ── COUNTDOWN ──
+function updateCountdown() {
+  const wedding = new Date(2026,10,14);
+  const now = new Date();
+  const days = Math.ceil((wedding-now)/86400000);
+  const el = document.getElementById('hudCountdown');
+  if(el) el.textContent = days > 0 ? `${days}d away` : '🎉 Today!';
+}
+
+// ── INIT ──
+function initApp() {
+  refreshMonthLabels();
+  refreshGlobalDisplays();
+  refreshDebtDisplays();
+  renderBudget();
+  renderWindfalls();
+  updateCountdown();
+  // Realtime subscription — when Jacynta updates, Liam sees it
+  sb.channel('finance_state')
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'finance_state',filter:`user_id=eq.${currentUser.id}`},
+      payload => {
+        appState = payload.new.state || {};
+        refreshGlobalDisplays();
+        refreshDebtDisplays();
+        renderBudget();
+        renderChecklist();
+        renderWindfalls();
+        setSyncStatus('synced');
+      })
+    .subscribe();
+}
+</script>
+</body>
+</html>
