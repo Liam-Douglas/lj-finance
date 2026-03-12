@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>L & J Finance</title>
+<title>HouseholdOS</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 <style>
@@ -18,85 +18,54 @@
   --rose:#b86060;--rose-dim:#301818;
   --text:#e8e0d0;--text-dim:#7a7060;--text-mid:#a89880;
   --good:#6aaa7a;--warn:#c89040;--danger:#c86060;
-  --liam:#7a9aba;--jacynta:#8aba8a;
+  --person1:#7a9aba;--person2:#8aba8a;
 }
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;font-size:14px}
 
-/* ── LOGIN ── */
-#loginScreen{
-  display:flex;align-items:center;justify-content:center;
-  min-height:100vh;padding:24px;
-}
-.login-box{
-  background:var(--bg2);border:1px solid var(--border2);border-radius:12px;
-  padding:48px 40px;width:100%;max-width:400px;
-}
-.login-logo{
-  font-family:'Playfair Display',serif;font-size:2rem;font-style:italic;
-  color:var(--brass);text-align:center;margin-bottom:8px;
-}
-.login-sub{font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);text-align:center;margin-bottom:36px}
-.login-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
-.login-label{font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim)}
-.login-input{
-  background:var(--bg3);border:1px solid var(--border2);border-radius:6px;
-  padding:10px 14px;font-family:'DM Mono',monospace;font-size:0.8rem;
-  color:var(--text);outline:none;transition:border-color 0.15s;
-}
-.login-input:focus{border-color:var(--brass)}
-.login-btn{
-  width:100%;padding:12px;background:var(--brass);border:none;border-radius:6px;
-  font-family:'DM Mono',monospace;font-size:0.75rem;font-weight:500;
-  color:#1a1410;cursor:pointer;margin-top:8px;letter-spacing:0.05em;
-  transition:background 0.15s;
-}
-.login-btn:hover{background:var(--brass-light)}
-.login-err{font-size:0.62rem;color:var(--danger);text-align:center;margin-top:10px;min-height:18px}
-.login-switch{font-size:0.62rem;color:var(--text-dim);text-align:center;margin-top:16px;cursor:pointer}
-.login-switch span{color:var(--brass);text-decoration:underline}
+/* ── LOGIN / ONBOARD ── */
+.auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+.auth-box{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:48px 40px;width:100%;max-width:440px}
+.auth-logo{font-family:'Playfair Display',serif;font-size:2rem;font-style:italic;color:var(--brass);text-align:center;margin-bottom:8px}
+.auth-sub{font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);text-align:center;margin-bottom:36px}
+.field-group{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field-label{font-size:0.56rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim)}
+.field-input{background:var(--bg3);border:1px solid var(--border2);border-radius:5px;padding:8px 11px;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--text);outline:none;width:100%;transition:border-color 0.15s}
+.field-input:focus{border-color:var(--brass)}
+select.field-input{appearance:none;cursor:pointer}
+.btn{width:100%;padding:12px;background:var(--brass);border:none;border-radius:6px;font-family:'DM Mono',monospace;font-size:0.75rem;font-weight:500;color:#1a1410;cursor:pointer;letter-spacing:0.05em;transition:background 0.15s}
+.btn:hover{background:var(--brass-light)}
+.btn:disabled{opacity:0.5;cursor:default}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}
+.btn-secondary:hover{border-color:var(--brass);background:var(--bg3)}
+.btn-danger{background:var(--rose-dim);color:var(--danger);border:1px solid var(--danger)}
+.btn-sm{padding:6px 14px;font-size:0.62rem;width:auto}
+.err-msg{font-size:0.62rem;color:var(--danger);text-align:center;margin-top:10px;min-height:18px}
+.success-msg{font-size:0.62rem;color:var(--good);text-align:center;margin-top:10px}
+.link-text{font-size:0.62rem;color:var(--text-dim);text-align:center;margin-top:16px;cursor:pointer}
+.link-text span{color:var(--brass);text-decoration:underline}
 
 /* ── HUD ── */
-.hud{
-  position:sticky;top:0;z-index:100;background:var(--bg2);
-  border-bottom:1px solid var(--border2);padding:0 20px;
-  display:flex;align-items:center;gap:0;height:52px;
-}
-.hud-brand{
-  font-family:'Playfair Display',serif;font-size:1rem;font-style:italic;
-  color:var(--brass);padding-right:20px;border-right:1px solid var(--border);
-  margin-right:20px;white-space:nowrap;
-}
+.hud{position:sticky;top:0;z-index:100;background:var(--bg2);border-bottom:1px solid var(--border2);padding:0 20px;display:flex;align-items:center;gap:0;height:52px}
+.hud-brand{font-family:'Playfair Display',serif;font-size:1rem;font-style:italic;color:var(--brass);padding-right:20px;border-right:1px solid var(--border);margin-right:20px;white-space:nowrap}
 .hud-stats{display:flex;gap:0;flex:1;overflow-x:auto}
 .hud-stat{display:flex;flex-direction:column;padding:0 16px;border-right:1px solid var(--border);min-width:110px}
 .hud-stat:first-child{padding-left:0}
 .hs-label{font-size:0.5rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:2px}
 .hs-value{font-size:0.78rem;font-weight:500;line-height:1}
-.hs-value.debt{color:var(--danger)}.hs-value.good{color:var(--good)}
-.hs-value.brass{color:var(--brass)}.hs-value.warn{color:var(--warn)}
 .hud-user{font-size:0.58rem;color:var(--text-dim);padding-left:16px;white-space:nowrap;cursor:pointer}
 .hud-user:hover{color:var(--danger)}
 
-/* ── SYNC STATUS ── */
-.sync-dot{
-  width:7px;height:7px;border-radius:50%;background:var(--text-dim);
-  display:inline-block;margin-right:6px;transition:background 0.3s;
-}
+/* ── SYNC ── */
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--text-dim);display:inline-block;margin-right:6px;transition:background 0.3s}
 .sync-dot.synced{background:var(--good)}
 .sync-dot.syncing{background:var(--warn);animation:pulse 1s infinite}
 .sync-dot.error{background:var(--danger)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
 /* ── TABS ── */
-.tabs{
-  background:var(--bg2);border-bottom:1px solid var(--border);
-  padding:0 20px;display:flex;gap:0;overflow-x:auto;
-}
-.tab{
-  padding:11px 16px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;
-  color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;
-  transition:all 0.15s;white-space:nowrap;user-select:none;
-}
+.tabs{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto}
+.tab{padding:11px 16px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;user-select:none}
 .tab:hover{color:var(--text-mid)}
 .tab.active{color:var(--brass);border-bottom-color:var(--brass)}
 
@@ -104,26 +73,16 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-
 .panel{display:none;padding:24px 20px 80px;max-width:1000px;margin:0 auto}
 .panel.active{display:block}
 
-/* ── MONTH NAVIGATOR ── */
-.month-nav{
-  display:flex;align-items:center;gap:16px;margin-bottom:20px;
-  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
-  padding:12px 16px;
-}
-.mn-btn{
-  background:var(--bg3);border:1px solid var(--border2);border-radius:5px;
-  padding:5px 12px;font-family:'DM Mono',monospace;font-size:0.65rem;
-  color:var(--text-dim);cursor:pointer;transition:all 0.15s;
-}
+/* ── MONTH NAV ── */
+.month-nav{display:flex;align-items:center;gap:16px;margin-bottom:20px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 16px}
+.mn-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:5px;padding:5px 12px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--text-dim);cursor:pointer;transition:all 0.15s}
 .mn-btn:hover{color:var(--text);border-color:var(--brass)}
 .mn-label{font-family:'Playfair Display',serif;font-size:1.1rem;font-style:italic;color:var(--brass);flex:1;text-align:center}
-.mn-note{font-size:0.58rem;color:var(--text-dim)}
 
 /* ── SEC HEADER ── */
 .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;flex-wrap:wrap}
 .sec-head h2{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:400;color:var(--text);font-style:italic}
 .sh-sub{font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim)}
-.phase-badge{display:inline-block;background:var(--brass-dim);border:1px solid var(--brass);border-radius:4px;padding:3px 10px;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--brass)}
 
 /* ── GRIDS ── */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -140,8 +99,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-
 .c-label{font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px}
 .c-value{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;line-height:1;margin-bottom:4px}
 .c-sub{font-size:0.58rem;color:var(--text-dim);line-height:1.5}
-
-/* ── DIVIDER ── */
 .divider{height:1px;background:var(--border);margin:20px 0}
 
 /* ── PROGRESS ── */
@@ -155,36 +112,19 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-
 .stat-row:last-child{border-bottom:none}
 .sr-label{color:var(--text-dim)}.sr-value{color:var(--text);font-weight:500}
 
-/* ── DEBT CARDS ── */
-.debt-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:8px;border-left:3px solid}
-.dc-top{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:start;margin-bottom:10px}
-.dc-badge{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.58rem;font-weight:500;flex-shrink:0;margin-top:2px}
-.dc-name{font-size:0.7rem;color:var(--text);font-weight:500}
-.dc-sub{font-size:0.56rem;color:var(--text-dim);margin-top:2px}
-.dc-bal{font-family:'Playfair Display',serif;font-size:1.2rem;text-align:right}
-.dc-rate{font-size:0.56rem;color:var(--text-dim);text-align:right}
-.dc-stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);padding-top:10px}
-.dc-stat{padding-right:10px}.dc-stat:not(:last-child){border-right:1px solid var(--border);margin-right:10px}
-.dcs-label{font-size:0.5rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim);margin-bottom:2px}
-.dcs-val{font-size:0.65rem;color:var(--text)}
-.dcs-val.accent{font-family:'Playfair Display',serif;color:var(--brass);font-size:0.78rem}
-.rollup{display:flex;align-items:center;gap:8px;padding:5px 12px;background:var(--bg3);border:1px dashed var(--border2);border-radius:5px;margin:0 0 8px;font-size:0.58rem;color:var(--text-dim)}
-.rollup::before{content:'↓';color:var(--brass);font-size:0.68rem}
-.rollup span{color:var(--brass)}
-
 /* ── BILLS TABLE ── */
 .bills-table{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
-.bt-head{display:grid;grid-template-columns:2fr 75px 75px 75px 85px;padding:7px 14px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.bt-head{display:grid;padding:7px 14px;background:var(--bg3);border-bottom:1px solid var(--border)}
 .bt-head span{font-size:0.52rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim)}
-.bt-row{display:grid;grid-template-columns:2fr 75px 75px 75px 85px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center;transition:background 0.12s}
+.bt-row{display:grid;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center;transition:background 0.12s}
 .bt-row:last-child{border-bottom:none}
 .bt-row:hover{background:var(--bg3)}
 .btr-name{font-size:0.65rem;color:var(--text)}
 .btr-sub{font-size:0.53rem;color:var(--text-dim);margin-top:1px}
 .btr-amt{font-family:'Playfair Display',serif;font-size:0.82rem}
-.btr-liam{color:var(--liam);font-size:0.63rem;font-family:'Playfair Display',serif}
-.btr-jac{color:var(--jacynta);font-size:0.63rem;font-family:'Playfair Display',serif}
-.bt-total{display:grid;grid-template-columns:2fr 75px 75px 75px 85px;padding:11px 14px;background:var(--bg3);border-top:1px solid var(--border2)}
+.btr-p1{color:var(--person1);font-size:0.63rem;font-family:'Playfair Display',serif}
+.btr-p2{color:var(--person2);font-size:0.63rem;font-family:'Playfair Display',serif}
+.bt-total{display:grid;padding:11px 14px;background:var(--bg3);border-top:1px solid var(--border2)}
 .btt-v{font-family:'Playfair Display',serif;font-size:0.88rem}
 
 /* ── TOGGLE ── */
@@ -192,7 +132,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-
 .tog-box{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:0.58rem;transition:all 0.12s;flex-shrink:0}
 .tog-box.on{background:var(--good);border-color:var(--good);color:#fff}
 .tog-label{font-size:0.58rem;color:var(--text-dim)}
-.tog.on .tog-label{color:var(--good)}
 
 /* ── PAY ROW ── */
 .pay-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;margin-bottom:5px;cursor:pointer;transition:border-color 0.12s}
@@ -203,25 +142,19 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-
 .pr-status.done{background:#1a3020;color:var(--good);border:1px solid #2a5030}
 .pr-status.pend{background:var(--rose-dim);color:var(--rose);border:1px solid #502020}
 
-/* ── WEDDING ── */
-.wt-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;margin-bottom:6px;gap:12px}
-.wt-row.crunch{background:#2a1a0a;border-color:var(--warn)}
-.wtr-vendor{font-size:0.63rem;color:var(--text)}
-.wtr-date{font-size:0.58rem;color:var(--text-dim);white-space:nowrap}
-.wtr-amt{font-family:'Playfair Display',serif;font-size:0.88rem;color:var(--brass);white-space:nowrap}
-
-/* ── PROJ TABLE ── */
-.proj-row{display:grid;grid-template-columns:80px 80px 80px 1fr;padding:7px 12px;border-bottom:1px solid var(--border);font-size:0.62rem;align-items:center}
-.proj-row.header{background:var(--bg3);font-size:0.52rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim)}
-.proj-row.crunch{background:#2a1a0a}
-.pr-bal{font-family:'Playfair Display',serif;font-size:0.78rem;color:var(--brass)}
-.pr-note{padding-left:10px}
-
-/* ── WINDFALLS ── */
-.wf-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;margin-bottom:6px}
-.wf-label{font-size:0.63rem;color:var(--text)}
-.wf-sub{font-size:0.56rem;color:var(--text-dim);margin-top:1px}
-.wf-amt{font-family:'Playfair Display',serif;font-size:0.88rem;color:var(--good);white-space:nowrap}
+/* ── DEBT CARDS ── */
+.debt-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:8px;border-left:3px solid var(--danger)}
+.dc-top{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:start;margin-bottom:10px}
+.dc-badge{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.58rem;font-weight:500;flex-shrink:0;margin-top:2px}
+.dc-name{font-size:0.7rem;color:var(--text);font-weight:500}
+.dc-sub{font-size:0.56rem;color:var(--text-dim);margin-top:2px}
+.dc-bal{font-family:'Playfair Display',serif;font-size:1.2rem;text-align:right}
+.dc-stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border);padding-top:10px}
+.dc-stat{padding-right:10px}.dc-stat:not(:last-child){border-right:1px solid var(--border);margin-right:10px}
+.dcs-label{font-size:0.5rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim);margin-bottom:2px}
+.dcs-val{font-size:0.65rem;color:var(--text)}
+.rollup{display:flex;align-items:center;gap:8px;padding:5px 12px;background:var(--bg3);border:1px dashed var(--border2);border-radius:5px;margin:0 0 8px;font-size:0.58rem;color:var(--text-dim)}
+.rollup span{color:var(--brass)}
 
 /* ── CHECKLIST ── */
 .check-item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;margin-bottom:5px;cursor:pointer;transition:border-color 0.12s}
@@ -231,7 +164,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-
 .check-item.done .ci-box{background:var(--good);border-color:var(--good);color:#fff}
 .ci-text{font-size:0.63rem;color:var(--text);line-height:1.4}
 .ci-owner{font-size:0.54rem;color:var(--text-dim);margin-top:2px}
-.check-sec-label{font-size:0.54rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--brass);margin:14px 0 7px;padding-bottom:4px;border-bottom:1px solid var(--brass-dim)}
 
 /* ── NET WORTH ── */
 .nw-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.63rem}
@@ -243,18 +175,37 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-
 .nwt-r{font-family:'Playfair Display',serif;font-size:1rem}
 .nw-head{font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--border)}
 
-/* ── FIELD ── */
-.field-group{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
-.field-label{font-size:0.56rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim)}
-.field-input{background:var(--bg3);border:1px solid var(--border2);border-radius:5px;padding:7px 11px;font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text);outline:none;width:100%;transition:border-color 0.15s}
-.field-input:focus{border-color:var(--brass)}
+/* ── WINDFALLS ── */
+.wf-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;margin-bottom:6px}
+.wf-label{font-size:0.63rem;color:var(--text)}
+.wf-sub{font-size:0.56rem;color:var(--text-dim);margin-top:1px}
+.wf-amt{font-family:'Playfair Display',serif;font-size:0.88rem;color:var(--good);white-space:nowrap}
 
 /* ── NOTE ── */
 .note{background:var(--brass-dim);border:1px solid var(--brass);border-radius:6px;padding:11px 14px;font-size:0.6rem;color:var(--text-mid);line-height:1.7}
 .note strong{color:var(--brass)}
 
-/* ── SECTION LABEL ── */
+/* ── SEC LABEL ── */
 .sec-label{font-size:0.54rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--brass);margin:14px 0 7px;padding-bottom:4px;border-bottom:1px solid var(--brass-dim)}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:200;display:none;overflow-y:auto;padding:40px 20px}
+.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:32px;max-width:500px;margin:40px auto}
+
+/* ── WIZARD ── */
+.wizard-wrap{max-width:600px;margin:0 auto;padding:40px 20px}
+.wiz-step{display:none}.wiz-step.active{display:block}
+.wiz-nav{display:flex;justify-content:space-between;margin-top:16px;gap:12px}
+
+/* ── INVITE CODE ── */
+.invite-display{font-family:'DM Mono',monospace;font-size:2rem;letter-spacing:0.3em;color:var(--brass);text-align:center;padding:20px;background:var(--bg3);border:2px dashed var(--brass-dim);border-radius:8px;margin:16px 0}
+
+/* ── SETTINGS ── */
+.settings-section{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
+.settings-section-title{font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--brass);margin-bottom:12px;cursor:pointer}
+.list-row{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)}
+.list-row:last-child{border-bottom:none}
+.remove-btn{color:var(--danger);cursor:pointer;font-size:0.8rem;padding:4px 8px;border:none;background:none;font-family:'DM Mono',monospace}
 
 /* ── ANIMATE ── */
 @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
@@ -262,73 +213,186 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-
 .panel.active>*:nth-child(1){animation-delay:0.02s}
 .panel.active>*:nth-child(2){animation-delay:0.05s}
 .panel.active>*:nth-child(3){animation-delay:0.08s}
-.panel.active>*:nth-child(4){animation-delay:0.11s}
-.panel.active>*:nth-child(5){animation-delay:0.14s}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════ -->
+<!-- ═══════════════════════════════════════ -->
 <!-- LOGIN SCREEN -->
-<!-- ═══════════════════════════════ -->
-<div id="loginScreen">
-  <div class="login-box">
-    <div class="login-logo">L & J</div>
-    <div class="login-sub">Household Finance · Private</div>
-    <div class="login-field">
-      <div class="login-label">Email</div>
-      <input class="login-input" type="email" id="loginEmail" placeholder="you@email.com" autocomplete="email">
+<!-- ═══════════════════════════════════════ -->
+<div id="loginScreen" class="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">HouseholdOS</div>
+    <div class="auth-sub">Your household finances, finally organised</div>
+    <div class="field-group">
+      <div class="field-label">Email</div>
+      <input class="field-input" type="email" id="loginEmail" placeholder="you@email.com" autocomplete="email">
     </div>
-    <div class="login-field">
-      <div class="login-label">Password</div>
-      <input class="login-input" type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleAuth()">
+    <div class="field-group">
+      <div class="field-label">Password</div>
+      <input class="field-input" type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleAuth()">
     </div>
-    <button class="login-btn" onclick="handleAuth()" id="authBtn">Sign In</button>
-    <div class="login-err" id="loginErr"></div>
-    <div class="login-switch" id="authToggle" onclick="toggleAuthMode()">
-      No account? <span>Create one</span>
+    <button class="btn" onclick="handleAuth()" id="authBtn">Sign In</button>
+    <div class="err-msg" id="loginErr"></div>
+    <div class="link-text" id="authToggle" onclick="toggleAuthMode()">No account? <span>Create one</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- ONBOARD SCREEN -->
+<!-- ═══════════════════════════════════════ -->
+<div id="onboardScreen" class="auth-screen" style="display:none">
+  <div class="auth-box" style="max-width:480px">
+    <div class="auth-logo">HouseholdOS</div>
+    <div class="auth-sub">Let's get you set up</div>
+    <div id="onboardChoice">
+      <div class="field-group">
+        <div class="field-label">Your display name</div>
+        <input class="field-input" id="newHouseholdName" placeholder="Your first name">
+      </div>
+      <button class="btn" onclick="startNewHousehold()" style="margin-bottom:12px">Start a new household</button>
+      <button class="btn btn-secondary" onclick="showJoinForm()">Join with invite code</button>
+    </div>
+    <div id="joinForm" style="display:none">
+      <div class="field-group">
+        <div class="field-label">Invite code</div>
+        <input class="field-input" id="joinCode" placeholder="ABC12345" maxlength="8" style="text-transform:uppercase;letter-spacing:0.15em">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Your display name</div>
+        <input class="field-input" id="joinName" placeholder="Your first name">
+      </div>
+      <button class="btn" onclick="joinWithCode()">Join Household</button>
+      <div class="err-msg" id="joinErr"></div>
+      <div class="link-text" onclick="showOnboardChoice()"><span>Back to options</span></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════ -->
+<!-- ═══════════════════════════════════════ -->
+<!-- SETUP WIZARD -->
+<!-- ═══════════════════════════════════════ -->
+<div id="setupScreen" style="display:none">
+  <div class="wizard-wrap">
+    <div class="auth-logo">HouseholdOS</div>
+    <div class="auth-sub">Setup your household</div>
+    <div class="prog-wrap" style="margin:20px 0">
+      <div class="prog-track" style="height:4px"><div class="prog-fill" id="wizProg" style="width:16.6%;background:var(--brass)"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:0.48rem;color:var(--text-dim);margin-top:4px">
+        <span>Basics</span><span>Income</span><span>Split</span><span>Bills</span><span>Debts</span><span>Goals</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Basics -->
+    <div class="wiz-step active" id="wizStep1">
+      <div class="card">
+        <div class="c-label">Step 1 — Your household</div>
+        <div class="field-group"><div class="field-label">Household name</div><input class="field-input" id="wiz_hhName" placeholder="e.g. The Smiths"></div>
+        <div class="field-group"><div class="field-label">Person 1 name</div><input class="field-input" id="wiz_p1name" placeholder="Your name"></div>
+        <div class="field-group"><div class="field-label">Person 2 name (optional)</div><input class="field-input" id="wiz_p2name" placeholder="Partner's name"></div>
+      </div>
+    </div>
+
+    <!-- Step 2: Income -->
+    <div class="wiz-step" id="wizStep2">
+      <div class="card" style="margin-bottom:12px">
+        <div class="c-label">Step 2 — Income</div>
+        <div class="sec-label" id="wiz_p1incLabel">Person 1</div>
+        <div class="grid3">
+          <div class="field-group"><div class="field-label">Take-home ($)</div><input class="field-input" type="number" id="wiz_p1pay" placeholder="0" oninput="wizUpdateSplit()"></div>
+          <div class="field-group"><div class="field-label">Frequency</div><select class="field-input" id="wiz_p1freq" onchange="wizTogglePayDay(1)"><option value="monthly">Monthly</option><option value="fortnightly">Fortnightly</option><option value="weekly">Weekly</option></select></div>
+          <div class="field-group" id="wiz_p1dayGroup"><div class="field-label">Pay day (day of month)</div><input class="field-input" type="number" id="wiz_p1day" placeholder="14" min="1" max="31"></div>
+        </div>
+      </div>
+      <div class="card" id="wiz_p2incCard" style="display:none">
+        <div class="sec-label" id="wiz_p2incLabel">Person 2</div>
+        <div class="grid3">
+          <div class="field-group"><div class="field-label">Take-home ($)</div><input class="field-input" type="number" id="wiz_p2pay" placeholder="0" oninput="wizUpdateSplit()"></div>
+          <div class="field-group"><div class="field-label">Frequency</div><select class="field-input" id="wiz_p2freq" onchange="wizTogglePayDay(2)"><option value="monthly">Monthly</option><option value="fortnightly">Fortnightly</option><option value="weekly">Weekly</option></select></div>
+          <div class="field-group" id="wiz_p2dayGroup"><div class="field-label">Pay day (day of month)</div><input class="field-input" type="number" id="wiz_p2day" placeholder="14" min="1" max="31"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Split -->
+    <div class="wiz-step" id="wizStep3">
+      <div class="card">
+        <div class="c-label">Step 3 — Bill split</div>
+        <div class="c-sub" style="margin-bottom:12px">How should shared bills be split?</div>
+        <div class="grid2">
+          <div class="field-group"><div class="field-label" id="wiz_split1Label">Person 1 %</div><input class="field-input" type="number" id="wiz_split1" value="50" min="0" max="100" oninput="wizSyncSplit(1)"></div>
+          <div class="field-group"><div class="field-label" id="wiz_split2Label">Person 2 %</div><input class="field-input" type="number" id="wiz_split2" value="50" min="0" max="100" oninput="wizSyncSplit(2)"></div>
+        </div>
+        <div class="c-sub" style="margin-top:8px" id="wiz_splitPreview">Split preview will appear here</div>
+      </div>
+    </div>
+
+    <!-- Step 4: Bills -->
+    <div class="wiz-step" id="wizStep4">
+      <div class="card">
+        <div class="c-label">Step 4 — Monthly bills</div>
+        <div class="c-sub" style="margin-bottom:12px">Add your recurring monthly bills. Edit or remove as needed.</div>
+        <div id="wizBillsList"></div>
+        <button class="btn btn-secondary btn-sm" onclick="wizAddBill()" style="margin-top:8px">+ Add bill</button>
+        <div class="divider"></div>
+        <div class="stat-row"><span class="sr-label">Total monthly bills</span><span class="sr-value" style="color:var(--brass)" id="wizBillsTotal">$0</span></div>
+      </div>
+    </div>
+
+    <!-- Step 5: Debts -->
+    <div class="wiz-step" id="wizStep5">
+      <div class="card">
+        <div class="c-label">Step 5 — Debts (optional)</div>
+        <div class="c-sub" style="margin-bottom:12px">Add consumer debts. They'll be sorted by interest rate (avalanche method) for fastest payoff.</div>
+        <div id="wizDebtsList"></div>
+        <button class="btn btn-secondary btn-sm" onclick="wizAddDebt()" style="margin-top:8px">+ Add debt</button>
+        <div class="divider"></div>
+        <div class="stat-row"><span class="sr-label">Total debt</span><span class="sr-value" style="color:var(--danger)" id="wizDebtsTotal">$0</span></div>
+      </div>
+    </div>
+
+    <!-- Step 6: Goals -->
+    <div class="wiz-step" id="wizStep6">
+      <div class="card">
+        <div class="c-label">Step 6 — Savings goals (optional)</div>
+        <div class="c-sub" style="margin-bottom:12px">Add savings goals like emergency fund, house deposit, or anything you're saving for.</div>
+        <div id="wizGoalsList"></div>
+        <button class="btn btn-secondary btn-sm" onclick="wizAddGoal()" style="margin-top:8px">+ Add goal</button>
+      </div>
+    </div>
+
+    <!-- Wizard nav -->
+    <div class="wiz-nav">
+      <button class="btn btn-secondary btn-sm" id="wizBack" onclick="wizardNav(-1)" style="display:none">Back</button>
+      <button class="btn" id="wizNext" onclick="wizardNav(1)">Next</button>
+    </div>
+    <div class="err-msg" id="wizErr"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- INVITE CODE SCREEN (shown after wizard) -->
+<!-- ═══════════════════════════════════════ -->
+<div id="inviteScreen" class="auth-screen" style="display:none">
+  <div class="auth-box" style="max-width:480px">
+    <div class="auth-logo">You're all set!</div>
+    <div class="auth-sub">Share this code with your partner so they can join</div>
+    <div class="invite-display" id="inviteCodeDisplay">--------</div>
+    <div class="c-sub" style="text-align:center;margin-bottom:16px">Code expires in 72 hours. You can regenerate it in Settings.</div>
+    <button class="btn" onclick="showScreen('app');initApp()">Go to Dashboard</button>
+    <button class="btn btn-secondary" onclick="showScreen('app');initApp()" style="margin-top:8px">Skip — I'll invite later</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
 <!-- APP -->
-<!-- ═══════════════════════════════ -->
+<!-- ═══════════════════════════════════════ -->
 <div id="app" style="display:none">
 
   <!-- HUD -->
   <div class="hud">
-    <div class="hud-brand">L & J</div>
-    <div class="hud-stats">
-      <div class="hud-stat">
-        <div class="hs-label">Combined income</div>
-        <div class="hs-value brass">$11,752/mo</div>
-      </div>
-      <div class="hud-stat">
-        <div class="hs-label">Consumer debt</div>
-        <div class="hs-value debt" id="hudDebt">$27,475</div>
-      </div>
-      <div class="hud-stat">
-        <div class="hs-label">Monthly attack</div>
-        <div class="hs-value warn">$1,559/mo</div>
-      </div>
-      <div class="hud-stat">
-        <div class="hs-label">Debt-free</div>
-        <div class="hs-value good">Early 2029</div>
-      </div>
-      <div class="hud-stat">
-        <div class="hs-label">Wedding fund</div>
-        <div class="hs-value warn" id="hudWedding">$0</div>
-      </div>
-      <div class="hud-stat">
-        <div class="hs-label">Wedding</div>
-        <div class="hs-value brass" id="hudCountdown">—</div>
-      </div>
-      <div class="hud-stat">
-        <div class="hs-label">Fire Fund</div>
-        <div class="hs-value danger" id="hudFire">$0</div>
-      </div>
-    </div>
+    <div class="hud-brand" id="hudBrand">HOS</div>
+    <div class="hud-stats" id="hudStats"></div>
     <div class="hud-user" onclick="signOut()">
       <span class="sync-dot" id="syncDot"></span>
       <span id="hudUserEmail"></span> · sign out
@@ -336,465 +400,68 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-
   </div>
 
   <!-- TABS -->
-  <div class="tabs">
-    <div class="tab active" onclick="showTab('dashboard',this)">Dashboard</div>
-    <div class="tab" onclick="showTab('budget',this)">Budget & Bills</div>
-    <div class="tab" onclick="showTab('debt',this)">Debt</div>
-    <div class="tab" onclick="showTab('wedding',this)">Wedding</div>
-    <div class="tab" onclick="showTab('savings',this)">Fire Fund & Deposit</div>
-    <div class="tab" onclick="showTab('networth',this)">Net Worth</div>
-    <div class="tab" onclick="showTab('windfalls',this)">Windfalls</div>
-    <div class="tab" onclick="showTab('checklist',this)">Checklist</div>
-  </div>
+  <div class="tabs" id="tabBar"></div>
 
-  <!-- ════════════ DASHBOARD ════════════ -->
-  <div class="panel active" id="panel-dashboard">
-    <div class="month-nav">
-      <button class="mn-btn" onclick="changeMonth(-1)">← prev</button>
-      <div class="mn-label" id="mnLabel">—</div>
-      <button class="mn-btn" onclick="changeMonth(1)">next →</button>
-      <div class="mn-note" id="mnPhase"></div>
-    </div>
-    <div class="sec-head"><h2>Dashboard</h2><div class="phase-badge" id="dashPhase">Phase 1 — Survive the Move</div></div>
-    <div class="grid4" style="margin-bottom:12px">
-      <div class="card brass-accent"><div class="c-label">Liam take-home</div><div class="c-value" style="color:var(--liam);font-size:1.2rem">$7,679</div><div class="c-sub">monthly · 14th</div></div>
-      <div class="card brass-accent"><div class="c-label">Jacynta take-home</div><div class="c-value" style="color:var(--jacynta);font-size:1.2rem">$1,880</div><div class="c-sub">fortnightly · ~$4,073/mo</div></div>
-      <div class="card brass-accent"><div class="c-label">Combined monthly</div><div class="c-value" style="color:var(--brass);font-size:1.2rem">$11,752</div><div class="c-sub">conservative · 65/35</div></div>
-      <div class="card brass-accent"><div class="c-label">Interest burn</div><div class="c-value" style="color:var(--danger);font-size:1.2rem" id="dInterest">$473</div><div class="c-sub">per month to lenders</div></div>
-    </div>
-    <div class="grid2" style="margin-bottom:12px">
-      <div class="card">
-        <div class="c-label">Consumer debt</div>
-        <div class="c-value" style="color:var(--danger)" id="dDebt">$27,475</div>
-        <div class="prog-wrap">
-          <div class="prog-label"><span>payoff progress</span><span>Early 2029</span></div>
-          <div class="prog-track"><div class="prog-fill" id="dDebtProg" style="width:0%;background:var(--danger)"></div></div>
-        </div>
-        <div class="c-sub" style="margin-top:6px">$1,559/month combined · Liam $1,180 + Jac $379</div>
-      </div>
-      <div class="card">
-        <div class="c-label">ATO debts — clears July 2026</div>
-        <div class="c-value" style="color:var(--warn)">$11,801</div>
-        <div class="prog-wrap">
-          <div class="prog-label"><span>clears at FY26 return</span><span>July 2026</span></div>
-          <div class="prog-track"><div class="prog-fill" style="width:0%;background:var(--warn)"></div></div>
-        </div>
-        <div class="c-sub" style="margin-top:6px">HELP $2,225 + SSL $7,039 + overdue tax $2,537 · call ATO 13 28 61</div>
-      </div>
-    </div>
-    <div class="grid3" style="margin-bottom:12px">
-      <div class="card sage-accent">
-        <div class="c-label">Fire Fund</div>
-        <div class="c-value" style="font-size:1.2rem" id="dFire" >$0</div>
-        <div class="prog-wrap">
-          <div class="prog-label"><span>3-month target</span><span>$16,165</span></div>
-          <div class="prog-track"><div class="prog-fill" id="dFireProg" style="width:0%;background:var(--sage)"></div></div>
-        </div>
-        <div class="c-sub">Defence Bank 4%+ · open this week</div>
-      </div>
-      <div class="card sage-accent">
-        <div class="c-label">Wedding Fund</div>
-        <div class="c-value" style="font-size:1.2rem" id="dWedding">$0</div>
-        <div class="prog-wrap">
-          <div class="prog-label"><span>Oct target $11,955</span><span id="dWedPct">0%</span></div>
-          <div class="prog-track"><div class="prog-fill" id="dWedProg" style="width:0%;background:var(--rose)"></div></div>
-        </div>
-        <div class="c-sub">November 2026 · $2,500/month needed</div>
-      </div>
-      <div class="card sage-accent">
-        <div class="c-label">House Deposit</div>
-        <div class="c-value" style="font-size:1.2rem" id="dDeposit">$0</div>
-        <div class="prog-wrap">
-          <div class="prog-label"><span>target $100K</span><span id="dDepPct">0%</span></div>
-          <div class="prog-track"><div class="prog-fill" id="dDepProg" style="width:0%;background:var(--slate)"></div></div>
-        </div>
-        <div class="c-sub">Defence Bank 4%+ · Phase 3</div>
-      </div>
-    </div>
-    <div class="grid2">
-      <div class="card">
-        <div class="c-label" style="margin-bottom:10px">Move bridge — April/May 2026</div>
-        <div class="stat-row"><span class="sr-label">Liam everyday (confirmed)</span><span class="sr-value" style="color:var(--good)">$1,300</span></div>
-        <div class="stat-row"><span class="sr-label">April bonus (after tax)</span><span class="sr-value" style="color:var(--good)">~$3,373</span></div>
-        <div class="stat-row"><span class="sr-label">Bond refund (~mid-May)</span><span class="sr-value" style="color:var(--good)">$2,800</span></div>
-        <div class="stat-row"><span class="sr-label">Moving cost estimate</span><span class="sr-value" style="color:var(--warn)">$4,000–$6,000</span></div>
-        <div class="stat-row"><span class="sr-label">Bridge available</span><span class="sr-value" style="color:var(--brass)">~$7,473</span></div>
-      </div>
-      <div class="card">
-        <div class="c-label" style="margin-bottom:10px">🔴 This week</div>
-        <div class="stat-row"><span class="sr-label">Call ATO 13 28 61</span><span class="sr-value">GIC remission</span></div>
-        <div class="stat-row"><span class="sr-label">Open Fire Fund — Defence Bank</span><span class="sr-value">Jacynta</span></div>
-        <div class="stat-row"><span class="sr-label">Set up $175/fn debt transfer</span><span class="sr-value">Both</span></div>
-        <div class="stat-row"><span class="sr-label">Get 3 removalist quotes</span><span class="sr-value">This week</span></div>
-        <div class="stat-row"><span class="sr-label">Update 65/35 bank transfers</span><span class="sr-value">Both</span></div>
-      </div>
-    </div>
-  </div>
+  <!-- PANELS -->
+  <div class="panel active" id="panel-dashboard"></div>
+  <div class="panel" id="panel-budget"></div>
+  <div class="panel" id="panel-debt"></div>
+  <div class="panel" id="panel-goals"></div>
+  <div class="panel" id="panel-networth"></div>
+  <div class="panel" id="panel-windfalls"></div>
+  <div class="panel" id="panel-checklist"></div>
+  <div class="panel" id="panel-settings"></div>
 
-  <!-- ════════════ BUDGET ════════════ -->
-  <div class="panel" id="panel-budget">
-    <div class="month-nav">
-      <button class="mn-btn" onclick="changeMonth(-1)">← prev</button>
-      <div class="mn-label" id="budgetMonthLabel">—</div>
-      <button class="mn-btn" onclick="changeMonth(1)">next →</button>
-    </div>
-    <div class="sec-head"><h2>Budget & Bills</h2><span class="sh-sub">65/35 split · joint bills account</span></div>
-    <div class="grid2" style="margin-bottom:16px">
-      <div class="card" style="border-left:3px solid var(--liam)">
-        <div class="c-label">Liam · paid 14th monthly</div>
-        <div class="c-value" style="color:var(--liam);font-size:1.1rem">$2,820</div>
-        <div class="c-sub" style="margin-bottom:10px">transfer to joint bills on the 14th</div>
-        <div id="liamPayRows"></div>
-      </div>
-      <div class="card" style="border-left:3px solid var(--jacynta)">
-        <div class="c-label">Jacynta · fortnightly wednesdays</div>
-        <div class="c-value" style="color:var(--jacynta);font-size:1.1rem">$658</div>
-        <div class="c-sub" style="margin-bottom:10px">per fortnight · ~$1,316/month across 2 pays</div>
-        <div id="jacyntaPayRows"></div>
-      </div>
-    </div>
-    <div class="bills-table">
-      <div class="bt-head"><span>Bill</span><span>Monthly</span><span>Liam 65%</span><span>Jac 35%</span><span>Status</span></div>
-      <div id="billsRows"></div>
-      <div class="bt-total">
-        <span style="font-size:0.6rem;color:var(--text-dim)">Monthly total</span>
-        <span class="btt-v">$4,338</span>
-        <span class="btt-v" style="color:var(--liam)">$2,820</span>
-        <span class="btt-v" style="color:var(--jacynta)">$1,518</span>
-        <span></span>
-      </div>
-    </div>
-    <div class="divider"></div>
-    <div class="grid4">
-      <div class="card"><div class="c-label">Liam transferred</div><div class="c-value" style="font-size:1.1rem;color:var(--liam)" id="bLiamIn">$0</div><div class="c-sub">of $2,820</div></div>
-      <div class="card"><div class="c-label">Jacynta transferred</div><div class="c-value" style="font-size:1.1rem;color:var(--jacynta)" id="bJacIn">$0</div><div class="c-sub">of $1,518 (2 pays)</div></div>
-      <div class="card"><div class="c-label">Bills paid out</div><div class="c-value" style="font-size:1.1rem" id="bOut">$0</div><div class="c-sub">of $4,338</div></div>
-      <div class="card"><div class="c-label">Account balance</div><div class="c-value" style="font-size:1.1rem" id="bBal">$0</div><div class="c-sub" id="bBalSub">awaiting transfers</div></div>
-    </div>
-  </div>
-
-  <!-- ════════════ DEBT ════════════ -->
-  <div class="panel" id="panel-debt">
-    <div class="sec-head"><h2>Debt Tracker</h2><span class="sh-sub">avalanche · $1,559/month combined</span></div>
-    <div class="grid4" style="margin-bottom:16px">
-      <div class="card rose-accent"><div class="c-label">Total debt</div><div class="c-value" style="color:var(--danger);font-size:1.2rem" id="debtTotal">$27,475</div><div class="c-sub">4 consumer debts</div></div>
-      <div class="card rose-accent"><div class="c-label">Monthly interest</div><div class="c-value" style="color:var(--warn);font-size:1.2rem" id="debtInterest">$473</div><div class="c-sub">$5,676/year</div></div>
-      <div class="card rose-accent"><div class="c-label">Combined attack</div><div class="c-value" style="font-size:1.2rem">$1,559</div><div class="c-sub">Liam $1,180 + Jac $379</div></div>
-      <div class="card rose-accent"><div class="c-label">Debt-free</div><div class="c-value" style="color:var(--good);font-size:1.2rem">Early 2029</div><div class="c-sub">~35 months</div></div>
-    </div>
-
-    <!-- Live balance inputs -->
-    <div class="note" style="margin-bottom:14px"><strong>Update balances monthly</strong> after each statement to track real progress. Interest and payoff dates auto-calculate.</div>
-    <div class="grid4" style="margin-bottom:16px">
-      <div class="field-group"><div class="field-label">Personal Loan balance</div><input class="field-input" type="number" id="d1bal" placeholder="2650" oninput="saveDebtBal(0,this.value)"></div>
-      <div class="field-group"><div class="field-label">Zip Money balance</div><input class="field-input" type="number" id="d2bal" placeholder="2950" oninput="saveDebtBal(1,this.value)"></div>
-      <div class="field-group"><div class="field-label">Credit Card 2 balance</div><input class="field-input" type="number" id="d3bal" placeholder="6950" oninput="saveDebtBal(2,this.value)"></div>
-      <div class="field-group"><div class="field-label">Credit Card 1 balance</div><input class="field-input" type="number" id="d4bal" placeholder="14925" oninput="saveDebtBal(3,this.value)"></div>
-    </div>
-
-    <div class="debt-card" style="border-left-color:#c86060">
-      <div class="dc-top">
-        <div class="dc-badge" style="background:#3a1515;color:#c86060;border:1px solid #c86060">1</div>
-        <div><div class="dc-name">Personal Loan</div><div class="dc-sub">Current #1 — all acceleration here</div></div>
-        <div><div class="dc-bal" style="color:#c86060" id="dc1bal">$2,650</div><div class="dc-rate">20.45% p.a.</div></div>
-      </div>
-      <div class="prog-track" style="margin-bottom:10px"><div class="prog-fill" id="dc1prog" style="width:0%;background:#c86060"></div></div>
-      <div class="dc-stats">
-        <div class="dc-stat"><div class="dcs-label">Liam payment</div><div class="dcs-val">$400/mo</div></div>
-        <div class="dc-stat"><div class="dcs-label">Jac accel</div><div class="dcs-val">$379/mo</div></div>
-        <div class="dc-stat"><div class="dcs-label">Monthly interest</div><div class="dcs-val" id="dc1int">~$45</div></div>
-        <div class="dc-stat"><div class="dcs-label">Clears</div><div class="dcs-val accent">Oct 2026</div></div>
-      </div>
-    </div>
-    <div class="rollup">$400 rolls → Zip Money · attack becomes <span>$859/month</span></div>
-    <div class="debt-card" style="border-left-color:#c89040">
-      <div class="dc-top">
-        <div class="dc-badge" style="background:#3a2510;color:#c89040;border:1px solid #c89040">2</div>
-        <div><div class="dc-name">Zip Money</div><div class="dc-sub">Highest rate — destroyed by roll-up</div></div>
-        <div><div class="dc-bal" style="color:#c89040" id="dc2bal">$2,950</div><div class="dc-rate">25.9% + $9.95 fee</div></div>
-      </div>
-      <div class="prog-track" style="margin-bottom:10px"><div class="prog-fill" id="dc2prog" style="width:0%;background:#c89040"></div></div>
-      <div class="dc-stats">
-        <div class="dc-stat"><div class="dcs-label">Min payment</div><div class="dcs-val">$80/mo</div></div>
-        <div class="dc-stat"><div class="dcs-label">After roll-up</div><div class="dcs-val">$859/mo</div></div>
-        <div class="dc-stat"><div class="dcs-label">Monthly interest</div><div class="dcs-val" id="dc2int">~$74</div></div>
-        <div class="dc-stat"><div class="dcs-label">Clears</div><div class="dcs-val accent">Feb 2027</div></div>
-      </div>
-    </div>
-    <div class="rollup">$480 rolls → Credit Card 2 · attack becomes <span>$1,259/month</span></div>
-    <div class="debt-card" style="border-left-color:#c8c040">
-      <div class="dc-top">
-        <div class="dc-badge" style="background:#303010;color:#c8c040;border:1px solid #c8c040">3</div>
-        <div><div class="dc-name">Credit Card 2</div><div class="dc-sub">Mid-tier — gone under a year with roll-up</div></div>
-        <div><div class="dc-bal" style="color:#c8c040" id="dc3bal">$6,950</div><div class="dc-rate">20.0% p.a.</div></div>
-      </div>
-      <div class="prog-track" style="margin-bottom:10px"><div class="prog-fill" id="dc3prog" style="width:0%;background:#c8c040"></div></div>
-      <div class="dc-stats">
-        <div class="dc-stat"><div class="dcs-label">Min payment</div><div class="dcs-val">$400/mo</div></div>
-        <div class="dc-stat"><div class="dcs-label">After roll-up</div><div class="dcs-val">$1,259/mo</div></div>
-        <div class="dc-stat"><div class="dcs-label">Monthly interest</div><div class="dcs-val" id="dc3int">~$116</div></div>
-        <div class="dc-stat"><div class="dcs-label">Clears</div><div class="dcs-val accent">Nov 2027</div></div>
-      </div>
-    </div>
-    <div class="rollup">$880 rolls → Credit Card 1 · full firepower <span>$1,559/month</span></div>
-    <div class="debt-card" style="border-left-color:#60aa70">
-      <div class="dc-top">
-        <div class="dc-badge" style="background:#102810;color:#60aa70;border:1px solid #60aa70">4</div>
-        <div><div class="dc-name">Credit Card 1</div><div class="dc-sub">The big one — full firepower hits last</div></div>
-        <div><div class="dc-bal" style="color:#60aa70" id="dc4bal">$14,925</div><div class="dc-rate">19.99% p.a.</div></div>
-      </div>
-      <div class="prog-track" style="margin-bottom:10px"><div class="prog-fill" id="dc4prog" style="width:0%;background:#60aa70"></div></div>
-      <div class="dc-stats">
-        <div class="dc-stat"><div class="dcs-label">Min payment</div><div class="dcs-val">$300/mo</div></div>
-        <div class="dc-stat"><div class="dcs-label">After roll-up</div><div class="dcs-val">$1,559/mo</div></div>
-        <div class="dc-stat"><div class="dcs-label">Monthly interest</div><div class="dcs-val" id="dc4int">~$249</div></div>
-        <div class="dc-stat"><div class="dcs-label">Clears</div><div class="dcs-val accent">Early 2029</div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ════════════ WEDDING ════════════ -->
-  <div class="panel" id="panel-wedding">
-    <div class="sec-head"><h2>Wedding</h2><span class="sh-sub">November 2026 · no ceiling · track as we go</span></div>
-    <div class="grid4" style="margin-bottom:16px">
-      <div class="card"><div class="c-label">Confirmed vendors</div><div class="c-value" style="color:var(--brass);font-size:1.1rem">$16,850</div><div class="c-sub">6 vendors booked</div></div>
-      <div class="card"><div class="c-label">Already paid</div><div class="c-value" style="color:var(--good);font-size:1.1rem">$2,420</div><div class="c-sub">from joint account</div></div>
-      <div class="card"><div class="c-label">Still owing (confirmed)</div><div class="c-value" style="color:var(--danger);font-size:1.1rem">$14,430</div><div class="c-sub">across 6 vendors</div></div>
-      <div class="card"><div class="c-label">Wedding fund</div><div class="c-value" style="color:var(--danger);font-size:1.1rem" id="wfDisplay">$0</div><div class="c-sub" id="wfSub">open account this week</div></div>
-    </div>
-    <div class="field-group" style="max-width:200px;margin-bottom:16px">
-      <div class="field-label">Update wedding fund balance</div>
-      <input class="field-input" type="number" placeholder="0" id="wfInput" oninput="saveVal('weddingFund',this.value)">
-    </div>
-    <div class="prog-wrap" style="margin-bottom:16px">
-      <div class="prog-label"><span>Progress to October target ($11,955)</span><span id="wfPct">0%</span></div>
-      <div class="prog-track" style="height:7px"><div class="prog-fill" id="wfProg" style="width:0%;background:var(--rose)"></div></div>
-    </div>
-    <div class="sec-label">Confirmed payment schedule</div>
-    <div class="wt-row"><div><div class="wtr-vendor">Little Weddings — instalment 1</div></div><div class="wtr-date">20 May 2026</div><div class="wtr-amt">$580</div></div>
-    <div class="wt-row"><div><div class="wtr-vendor">Little Weddings — instalment 2</div></div><div class="wtr-date">20 Aug 2026</div><div class="wtr-amt">$1,385</div></div>
-    <div class="wt-row"><div><div class="wtr-vendor">Art by Grace — painting</div></div><div class="wtr-date">20 Oct 2026</div><div class="wtr-amt">$1,080</div></div>
-    <div class="wt-row crunch"><div><div class="wtr-vendor" style="color:var(--warn)">⚠️ November crunch — $10,385 due</div><div class="wtr-date" style="font-size:0.56rem;color:var(--text-dim);margin-top:3px">LW $1,385 · BC Films $1,700 · Photography $1,800 · Venue $5,500</div></div><div class="wtr-date">Nov 2026</div><div class="wtr-amt" style="color:var(--warn)">$10,385</div></div>
-    <div class="wt-row"><div><div class="wtr-vendor">Bill Olson Music</div></div><div class="wtr-date">Wedding day · cash</div><div class="wtr-amt">$1,000</div></div>
-    <div class="divider"></div>
-    <div class="sec-label">Fund projection — $2,500/month from May</div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px">
-      <div class="proj-row header"><span>Month</span><span>Top-up</span><span>Out</span><span class="pr-note">Balance</span></div>
-      <div class="proj-row"><span>May</span><span style="color:var(--good)">+$2,500</span><span style="color:var(--danger)">−$580</span><span class="pr-bal pr-note">$1,920</span></div>
-      <div class="proj-row"><span>June</span><span style="color:var(--good)">+$2,500</span><span>—</span><span class="pr-bal pr-note">$4,420</span></div>
-      <div class="proj-row"><span>July</span><span style="color:var(--good)">+$2,500</span><span>—</span><span class="pr-bal pr-note">$6,920</span></div>
-      <div class="proj-row"><span>August</span><span style="color:var(--good)">+$2,500</span><span style="color:var(--danger)">−$1,385</span><span class="pr-bal pr-note">$8,035</span></div>
-      <div class="proj-row"><span>September</span><span style="color:var(--good)">+$2,500</span><span>—</span><span class="pr-bal pr-note">$10,535</span></div>
-      <div class="proj-row crunch"><span>October</span><span style="color:var(--good)">+$2,500</span><span style="color:var(--danger)">−$1,080</span><span class="pr-bal pr-note" style="color:var(--warn)">$11,955 ⚠️</span></div>
-    </div>
-    <div class="sec-label">Still to book</div>
-    <div class="grid3">
-      <div class="card"><div class="c-label">Dress / Suits</div><div style="font-size:0.8rem;color:var(--text-mid);font-family:'Playfair Display',serif">$1,500–$3,000</div></div>
-      <div class="card"><div class="c-label">Floristry</div><div style="font-size:0.8rem;color:var(--text-mid);font-family:'Playfair Display',serif">$800–$2,000</div></div>
-      <div class="card"><div class="c-label">Hair & Makeup</div><div style="font-size:0.8rem;color:var(--text-mid);font-family:'Playfair Display',serif">$500–$1,200</div></div>
-      <div class="card"><div class="c-label">Cake</div><div style="font-size:0.8rem;color:var(--text-mid);font-family:'Playfair Display',serif">$400–$800</div></div>
-      <div class="card"><div class="c-label">Rings</div><div style="font-size:0.8rem;color:var(--text-mid);font-family:'Playfair Display',serif">$1,000–$3,000</div></div>
-      <div class="card"><div class="c-label">Transport</div><div style="font-size:0.8rem;color:var(--text-mid);font-family:'Playfair Display',serif">$400–$800</div></div>
-    </div>
-  </div>
-
-  <!-- ════════════ SAVINGS ════════════ -->
-  <div class="panel" id="panel-savings">
-    <div class="sec-head"><h2>Fire Fund & House Deposit</h2><span class="sh-sub">Defence Bank staff savings · 4%+</span></div>
-    <div class="grid2" style="margin-bottom:16px">
-      <div class="card sage-accent">
-        <div class="c-label">Fire Fund — Emergency Only</div>
-        <div class="c-value" style="color:var(--danger)" id="ffDisplay">$0</div>
-        <div class="field-group" style="margin:10px 0 8px"><div class="field-label">Update balance</div><input class="field-input" type="number" placeholder="0" id="ffInput" oninput="saveVal('fireFund',this.value)"></div>
-        <div class="prog-wrap"><div class="prog-label"><span>3-month target</span><span>$16,165</span></div><div class="prog-track"><div class="prog-fill" id="ffProg3" style="width:0%;background:var(--sage)"></div></div></div>
-        <div class="prog-wrap"><div class="prog-label"><span>6-month target</span><span>$32,329</span></div><div class="prog-track"><div class="prog-fill" id="ffProg6" style="width:0%;background:var(--sage);opacity:0.5"></div></div></div>
-        <div class="divider"></div>
-        <div class="stat-row"><span class="sr-label">Phase floor (1 & 2)</span><span class="sr-value" style="color:var(--warn)">$2,000–$3,000</span></div>
-        <div class="stat-row"><span class="sr-label">Interest at 4%</span><span class="sr-value" style="color:var(--good)">~$647/yr at target</span></div>
-        <div class="stat-row"><span class="sr-label">Where held</span><span class="sr-value" style="color:var(--sage)">Defence Bank 4%+</span></div>
-      </div>
-      <div class="card slate-accent">
-        <div class="c-label">House Deposit</div>
-        <div class="c-value" style="color:var(--danger)" id="hdDisplay">$0</div>
-        <div class="field-group" style="margin:10px 0 8px"><div class="field-label">Update balance</div><input class="field-input" type="number" placeholder="0" id="hdInput" oninput="saveVal('houseDeposit',this.value)"></div>
-        <div class="prog-wrap"><div class="prog-label"><span>target $100K</span><span id="hdPct100">0%</span></div><div class="prog-track"><div class="prog-fill" id="hdProg100" style="width:0%;background:var(--slate)"></div></div></div>
-        <div class="prog-wrap"><div class="prog-label"><span>target $150K</span><span id="hdPct150">0%</span></div><div class="prog-track"><div class="prog-fill" id="hdProg150" style="width:0%;background:var(--slate);opacity:0.5"></div></div></div>
-        <div class="divider"></div>
-        <div class="stat-row"><span class="sr-label">Target year</span><span class="sr-value">2031–2032</span></div>
-        <div class="stat-row"><span class="sr-label">Status</span><span class="sr-value" style="color:var(--warn)">Paused — Phase 1 & 2</span></div>
-        <div class="stat-row"><span class="sr-label">Staff mortgage</span><span class="sr-value" style="color:var(--sage)">Investigate Phase 4</span></div>
-        <div class="stat-row"><span class="sr-label">Where held</span><span class="sr-value" style="color:var(--slate)">Defence Bank 4%+</span></div>
-      </div>
-    </div>
-    <div class="note"><strong>Critical fix:</strong> Two separate auto-transfers on Liam's pay day — first $1,180 to the Debt Repayment Account, then Fire Fund contribution to Defence Bank. These must be at different banks. Never manual, never combined.</div>
-  </div>
-
-  <!-- ════════════ NET WORTH ════════════ -->
-  <div class="panel" id="panel-networth">
-    <div class="sec-head"><h2>Net Worth</h2><span class="sh-sub">update quarterly · last updated March 2026</span></div>
-    <div class="grid2">
-      <div class="card">
-        <div class="nw-head">Assets</div>
-        <div class="nw-row"><span class="nwr-l">Liam super (AustralianSuper)</span><span class="nwr-r pos">$60K–$100K</span></div>
-        <div class="nw-row"><span class="nwr-l">Jacynta super (HESTA)</span><span class="nwr-r pos">$30K–$60K</span></div>
-        <div class="nw-row"><span class="nwr-l">Liam — Pearler (VOO)</span><span class="nwr-r pos">&lt;$5K</span></div>
-        <div class="nw-row"><span class="nwr-l">Jacynta — Pearler (VOO)</span><span class="nwr-r pos">&lt;$5K</span></div>
-        <div class="nw-row"><span class="nwr-l">Fire Fund</span><span class="nwr-r pos" id="nwFF">$0</span></div>
-        <div class="nw-row"><span class="nwr-l">House Deposit</span><span class="nwr-r pos" id="nwHD">$0</span></div>
-        <div class="nw-row"><span class="nwr-l">Wedding Fund</span><span class="nwr-r pos" id="nwWF">$0</span></div>
-        <div class="nw-total"><span class="nwt-l">Total assets (est.)</span><span class="nwt-r pos">$90K–$170K+</span></div>
-      </div>
-      <div class="card">
-        <div class="nw-head">Liabilities</div>
-        <div class="nw-row"><span class="nwr-l">Personal Loan</span><span class="nwr-r neg" id="nwD1">$2,650</span></div>
-        <div class="nw-row"><span class="nwr-l">Zip Money</span><span class="nwr-r neg" id="nwD2">$2,950</span></div>
-        <div class="nw-row"><span class="nwr-l">Credit Card 2</span><span class="nwr-r neg" id="nwD3">$6,950</span></div>
-        <div class="nw-row"><span class="nwr-l">Credit Card 1</span><span class="nwr-r neg" id="nwD4">$14,925</span></div>
-        <div class="nw-row"><span class="nwr-l">ATO — Income Tax</span><span class="nwr-r neg">$2,537</span></div>
-        <div class="nw-row"><span class="nwr-l">ATO — HELP</span><span class="nwr-r neg">$2,225</span></div>
-        <div class="nw-row"><span class="nwr-l">ATO — SSL</span><span class="nwr-r neg">$7,039</span></div>
-        <div class="nw-total"><span class="nwt-l">Total liabilities</span><span class="nwt-r neg" id="nwTotalLiab">$39,276</span></div>
-        <div class="divider"></div>
-        <div class="nw-total" style="padding-top:0"><span class="nwt-l">Est. net worth</span><span class="nwt-r pos">$50K–$130K+</span></div>
-        <div style="font-size:0.58rem;color:var(--text-dim);margin-top:8px;line-height:1.6">Every debt cleared shifts net worth by its full balance. $27,475 improvement in one go at Early 2029.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ════════════ WINDFALLS ════════════ -->
-  <div class="panel" id="panel-windfalls">
-    <div class="sec-head"><h2>Windfalls</h2><span class="sh-sub">all pre-committed · every dollar has a job</span></div>
-    <div class="sec-label">Phase 1 — Survive the Move</div>
-    <div id="wfRows"></div>
-    <div class="sec-label" style="margin-top:16px">Phase 2 — Wedding Mode</div>
-    <div id="wfRows2"></div>
-    <div class="sec-label" style="margin-top:16px">Phase 3 — Debt Assault</div>
-    <div id="wfRows3"></div>
-    <div class="divider"></div>
-    <div class="note"><strong>Rule:</strong> Every windfall has a pre-assigned destination before it lands. Never let a windfall sit in an everyday account — it will be spent within 30 days.</div>
-  </div>
-
-  <!-- ════════════ CHECKLIST ════════════ -->
-  <div class="panel" id="panel-checklist">
-    <div class="month-nav">
-      <button class="mn-btn" onclick="changeMonth(-1)">← prev</button>
-      <div class="mn-label" id="checkMonthLabel">—</div>
-      <button class="mn-btn" onclick="changeMonth(1)">next →</button>
-    </div>
-    <div class="sec-head"><h2>Monthly Checklist</h2><span class="sh-sub">resets each month</span></div>
-    <div class="prog-wrap" style="margin-bottom:16px">
-      <div class="prog-label"><span>Complete</span><span id="checkPct">0%</span></div>
-      <div class="prog-track" style="height:6px"><div class="prog-fill" id="checkFill" style="width:0%;background:var(--good)"></div></div>
-    </div>
-    <div id="checklistEl"></div>
-  </div>
-
-</div><!-- end #app -->
+  <!-- PAY DAY MODAL -->
+  <div class="modal-overlay" id="paydayModal"></div>
+</div>
 
 <script>
 // ════════════════════════════════════════
-// SUPABASE CONFIG — replace with your own
+// CONFIG
 // ════════════════════════════════════════
 const SUPABASE_URL = '__SUPABASE_URL__';
 const SUPABASE_ANON_KEY = '__SUPABASE_ANON_KEY__';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ── STATIC DATA ──
-const BILLS = [
-  {name:'Rent',sub:'$1,400/fn · moving end April',amt:3033},
-  {name:'Electricity',sub:'⚠️ compare providers urgently',amt:600},
-  {name:'Gas',sub:'',amt:100},
-  {name:'Internet',sub:'',amt:109},
-  {name:'Health Insurance',sub:'Joint policy',amt:121},
-  {name:'Jacynta Phone',sub:'Device + plan bundled',amt:145},
-  {name:'Liam Phone',sub:'',amt:40},
-  {name:'Gym',sub:'2 × $21.95/week',amt:190.23},
-];
-
-const DEBT_RATES = [0.2045, 0.259, 0.20, 0.1999];
-const DEBT_STARTING = [2650, 2950, 6950, 14925];
-
-const WINDFALLS = [
-  [{id:'wf_apr_bonus',label:'April Bonus (Liam)',sub:'$3,000 → moving costs · $373 → Zip Money',amt:'~$3,373'},
-   {id:'wf_bond',label:'Bond Refund',sub:'~mid-May → Zip Money · clears it entirely',amt:'$2,800'}],
-  [{id:'wf_jac_bonus1',label:'Jacynta Bonus Pay #1',sub:'→ wedding fund immediately',amt:'~$1,880'},
-   {id:'wf_jac_bonus2',label:'Jacynta Bonus Pay #2',sub:'→ wedding fund',amt:'~$1,880'},
-   {id:'wf_jac_eofy',label:'Jacynta EOFY Refund',sub:'→ wedding fund',amt:'TBC'},
-   {id:'wf_hecs',label:'HECS/SSL Freed — August 2026',sub:"Will feel like a pay rise. It is not. Pre-commit all $840.",amt:'~$840/mo'}],
-  [{id:'wf_jac_rise',label:'Jacynta Pay Rise (pending)',sub:'Pre-commit entire increase to debt',amt:'TBC'},
-   {id:'wf_liam_eofy',label:'Liam EOFY Refund',sub:'~$0–$500 net after ATO offset → debt',amt:'~$0–$500'}],
-];
-
-const CHECKLIST_ITEMS = [
-  {section:'🔴 This Week',items:[
-    {id:'c_ato',text:'Call ATO 13 28 61 — request GIC remission on $2,537',owner:'Liam'},
-    {id:'c_fire',text:'Open Fire Fund at Defence Bank staff savings (4%+)',owner:'Jacynta'},
-    {id:'c_deposit',text:'Open House Deposit at Defence Bank staff savings (4%+)',owner:'Jacynta'},
-    {id:'c_jac_transfer',text:'Set up Jacynta $175/fn auto debt acceleration transfer',owner:'Both'},
-    {id:'c_split',text:'Update joint account transfers to 65/35 split',owner:'Both'},
-    {id:'c_removal',text:'Get 3 removalist quotes — book early',owner:'Both'},
-    {id:'c_bond',text:'Confirm bond refund process with property manager',owner:'Both'},
-  ]},
-  {section:'📅 Monthly',items:[
-    {id:'c_bills',text:'All bills paid — check joint bills account',owner:'Both'},
-    {id:'c_debt_bal',text:'Update all debt balances — note interest charged',owner:'Liam'},
-    {id:'c_fire_bal',text:'Record Fire Fund balance — above phase floor?',owner:'Both'},
-    {id:'c_wed_bal',text:'Record wedding fund balance — on track?',owner:'Both'},
-    {id:'c_var',text:'Review variable spending vs $1,050 budget',owner:'Both'},
-    {id:'c_jac_confirm',text:'Confirm Jacynta debt acceleration transfer went through',owner:'Jacynta'},
-    {id:'c_windfalls',text:'Note any windfalls — confirm pre-committed destination',owner:'Both'},
-  ]},
-  {section:'🟠 This Month',items:[
-    {id:'c_transport',text:'Confirm Jacynta transport costs (rego, insurance, fuel)',owner:'Jacynta'},
-    {id:'c_elec',text:'Compare electricity providers — $600/month is very high',owner:'Both'},
-    {id:'c_super_ins',text:'Check super insurance — AustralianSuper and HESTA',owner:'Both'},
-    {id:'c_super_ben',text:'Update super beneficiary nominations — both funds',owner:'Both'},
-  ]},
-  {section:'🟡 Quarterly',items:[
-    {id:'c_phone',text:'Note Jacynta phone contract end — plan SIM-only switch',owner:'Jacynta'},
-    {id:'c_nw',text:'Update net worth snapshot with real figures',owner:'Both'},
-    {id:'c_wills',text:'Get wills done before November wedding',owner:'Both'},
-  ]},
-];
-
-// ── STATE ──
-let currentMonth = new Date().getMonth();
-let currentYear  = new Date().getFullYear();
-let appState = {}; // loaded from Supabase
+// ════════════════════════════════════════
+// GLOBALS
+// ════════════════════════════════════════
 let currentUser = null;
-let isSignUp = false;
+let household = null;     // { id, name, settings, state }
+let membership = null;    // { person_number, display_name }
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
 let saveTimeout = null;
+let isSignUp = false;
 
-// ── AUTH ──
+// ════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════
 async function handleAuth() {
   const email = document.getElementById('loginEmail').value.trim();
-  const pass  = document.getElementById('loginPassword').value;
-  const btn   = document.getElementById('authBtn');
-  const err   = document.getElementById('loginErr');
+  const pass = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('authBtn');
+  const err = document.getElementById('loginErr');
   err.textContent = '';
   btn.textContent = isSignUp ? 'Creating account...' : 'Signing in...';
   btn.disabled = true;
 
-  let result;
-  if (isSignUp) {
-    result = await sb.auth.signUp({email,password:pass});
-  } else {
-    result = await sb.auth.signInWithPassword({email,password:pass});
-  }
+  const result = isSignUp
+    ? await sb.auth.signUp({ email, password: pass })
+    : await sb.auth.signInWithPassword({ email, password: pass });
 
   if (result.error) {
     err.textContent = result.error.message;
     btn.textContent = isSignUp ? 'Create Account' : 'Sign In';
     btn.disabled = false;
-  } else {
-    if (isSignUp && !result.data.session) {
-      err.style.color = 'var(--good)';
-      err.textContent = 'Check your email to confirm your account, then sign in.';
-      btn.textContent = 'Sign In';
-      btn.disabled = false;
-      isSignUp = false;
-      updateAuthUI();
-    }
+  } else if (isSignUp && !result.data.session) {
+    err.style.color = 'var(--good)';
+    err.textContent = 'Check your email to confirm, then sign in.';
+    btn.textContent = 'Sign In';
+    btn.disabled = false;
+    isSignUp = false;
+    updateAuthUI();
   }
 }
 
@@ -810,49 +477,428 @@ function updateAuthUI() {
     : 'No account? <span>Create one</span>';
 }
 
-async function signOut() {
-  await sb.auth.signOut();
+async function signOut() { await sb.auth.signOut(); }
+
+// ════════════════════════════════════════
+// ROUTING
+// ════════════════════════════════════════
+function showScreen(name) {
+  ['loginScreen','onboardScreen','setupScreen','inviteScreen','app'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  const map = { login:'loginScreen', onboard:'onboardScreen', setup:'setupScreen', invite:'inviteScreen', app:'app' };
+  const el = document.getElementById(map[name]);
+  if (el) el.style.display = (name === 'login' || name === 'onboard' || name === 'invite') ? 'flex' : 'block';
 }
 
-// ── SESSION ──
-sb.auth.onAuthStateChange(async (event, session) => {
-  if (session) {
-    currentUser = session.user;
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    document.getElementById('hudUserEmail').textContent = session.user.email.split('@')[0];
-    await loadState();
-    initApp();
-  } else {
-    currentUser = null;
-    document.getElementById('loginScreen').style.display = 'flex';
-    document.getElementById('app').style.display = 'none';
-  }
-});
-
-// ── SUPABASE STATE ──
-async function loadState() {
-  setSyncStatus('syncing');
-  const {data, error} = await sb
-    .from('finance_state')
-    .select('state')
+async function detectRoute() {
+  const { data: mem } = await sb
+    .from('household_members')
+    .select('person_number, display_name, household_id')
     .eq('user_id', currentUser.id)
     .single();
 
-  if (data) {
-    appState = data.state || {};
-  } else {
-    appState = {};
+  if (!mem) {
+    showScreen('onboard');
+    return;
   }
-  setSyncStatus('synced');
+
+  membership = { person_number: mem.person_number, display_name: mem.display_name };
+
+  const { data: hh } = await sb
+    .from('households')
+    .select('*')
+    .eq('id', mem.household_id)
+    .single();
+
+  if (!hh) { showScreen('onboard'); return; }
+  household = hh;
+
+  if (!household.settings?.persons?.length) {
+    wizardInit();
+    showScreen('setup');
+    return;
+  }
+
+  showScreen('app');
+  initApp();
 }
 
-async function saveState() {
-  setSyncStatus('syncing');
-  const {error} = await sb
-    .from('finance_state')
-    .upsert({user_id: currentUser.id, state: appState, updated_at: new Date().toISOString()}, {onConflict:'user_id'});
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (session) {
+    currentUser = session.user;
+    await detectRoute();
+  } else {
+    currentUser = null;
+    household = null;
+    membership = null;
+    showScreen('login');
+  }
+});
 
+// ════════════════════════════════════════
+// ONBOARDING
+// ════════════════════════════════════════
+function showJoinForm() {
+  document.getElementById('onboardChoice').style.display = 'none';
+  document.getElementById('joinForm').style.display = 'block';
+}
+function showOnboardChoice() {
+  document.getElementById('onboardChoice').style.display = 'block';
+  document.getElementById('joinForm').style.display = 'none';
+}
+
+async function startNewHousehold() {
+  const name = document.getElementById('newHouseholdName').value.trim();
+  if (!name) { alert('Please enter your name'); return; }
+
+  const { data: h, error: hErr } = await sb
+    .from('households')
+    .insert({ name: 'Our Household', settings: {}, state: {} })
+    .select()
+    .single();
+  if (hErr) { alert(hErr.message); return; }
+
+  const { error: mErr } = await sb
+    .from('household_members')
+    .insert({ user_id: currentUser.id, household_id: h.id, person_number: 1, display_name: name });
+  if (mErr) { alert(mErr.message); return; }
+
+  await detectRoute();
+}
+
+async function joinWithCode() {
+  const code = document.getElementById('joinCode').value.trim();
+  const name = document.getElementById('joinName').value.trim();
+  const err = document.getElementById('joinErr');
+  err.textContent = '';
+  if (!code || !name) { err.textContent = 'Both fields required'; return; }
+
+  const { error } = await sb.rpc('join_household', { p_code: code, p_display_name: name });
+  if (error) { err.textContent = error.message; return; }
+  await detectRoute();
+}
+
+// ════════════════════════════════════════
+// SETUP WIZARD
+// ════════════════════════════════════════
+let wizStep = 1;
+const WIZ_TOTAL = 6;
+
+const DEFAULT_BILLS = [
+  { name: 'Rent / Mortgage', monthly: 0 },
+  { name: 'Electricity', monthly: 0 },
+  { name: 'Gas', monthly: 0 },
+  { name: 'Internet', monthly: 0 },
+  { name: 'Health Insurance', monthly: 0 },
+  { name: 'Phone (Person 1)', monthly: 0 },
+  { name: 'Phone (Person 2)', monthly: 0 },
+  { name: 'Gym', monthly: 0 },
+];
+
+function wizardInit() {
+  wizStep = 1;
+  if (membership) {
+    document.getElementById('wiz_p1name').value = membership.display_name;
+  }
+  wizRenderBills(DEFAULT_BILLS);
+  wizRenderDebts([]);
+  wizRenderGoals([]);
+  wizRenderStep();
+}
+
+function wizRenderStep() {
+  for (let i = 1; i <= WIZ_TOTAL; i++) {
+    const el = document.getElementById('wizStep' + i);
+    el.classList.toggle('active', i === wizStep);
+  }
+  document.getElementById('wizBack').style.display = wizStep > 1 ? 'inline-block' : 'none';
+  document.getElementById('wizNext').textContent = wizStep === WIZ_TOTAL ? 'Finish Setup' : 'Next';
+  document.getElementById('wizProg').style.width = (wizStep / WIZ_TOTAL * 100) + '%';
+  document.getElementById('wizErr').textContent = '';
+
+  // Dynamic updates per step
+  if (wizStep === 2) {
+    const p1 = document.getElementById('wiz_p1name').value || 'Person 1';
+    const p2 = document.getElementById('wiz_p2name').value;
+    document.getElementById('wiz_p1incLabel').textContent = p1;
+    document.getElementById('wiz_p2incCard').style.display = p2 ? 'block' : 'none';
+    if (p2) document.getElementById('wiz_p2incLabel').textContent = p2;
+  }
+  if (wizStep === 3) {
+    const p1 = document.getElementById('wiz_p1name').value || 'Person 1';
+    const p2 = document.getElementById('wiz_p2name').value || 'Person 2';
+    document.getElementById('wiz_split1Label').textContent = p1 + ' %';
+    document.getElementById('wiz_split2Label').textContent = p2 + ' %';
+    wizUpdateSplitPreview();
+  }
+  if (wizStep === 4) wizUpdateBillsTotal();
+  if (wizStep === 5) wizUpdateDebtsTotal();
+}
+
+function wizardNav(dir) {
+  if (dir === 1) {
+    if (!wizValidateStep()) return;
+    if (wizStep === WIZ_TOTAL) { finishWizard(); return; }
+  }
+  wizStep = Math.max(1, Math.min(WIZ_TOTAL, wizStep + dir));
+  wizRenderStep();
+}
+
+function wizValidateStep() {
+  const err = document.getElementById('wizErr');
+  if (wizStep === 1) {
+    if (!document.getElementById('wiz_hhName').value.trim()) { err.textContent = 'Household name is required'; return false; }
+    if (!document.getElementById('wiz_p1name').value.trim()) { err.textContent = 'Person 1 name is required'; return false; }
+  }
+  if (wizStep === 2) {
+    if (!parseFloat(document.getElementById('wiz_p1pay').value)) { err.textContent = 'Person 1 income is required'; return false; }
+  }
+  return true;
+}
+
+function wizTogglePayDay(pNum) {
+  const freq = document.getElementById('wiz_p' + pNum + 'freq').value;
+  const group = document.getElementById('wiz_p' + pNum + 'dayGroup');
+  const label = group.querySelector('.field-label');
+  if (freq === 'monthly') {
+    label.textContent = 'Pay day (day of month)';
+    document.getElementById('wiz_p' + pNum + 'day').placeholder = '14';
+  } else {
+    label.textContent = 'Anchor date (last pay day)';
+    document.getElementById('wiz_p' + pNum + 'day').type = 'date';
+  }
+}
+
+function wizUpdateSplit() {
+  const p1 = parseFloat(document.getElementById('wiz_p1pay').value) || 0;
+  const p2 = parseFloat(document.getElementById('wiz_p2pay').value) || 0;
+  const total = p1 + p2;
+  if (total > 0) {
+    const p1m = p1 * (document.getElementById('wiz_p1freq').value === 'fortnightly' ? 26/12 : document.getElementById('wiz_p1freq').value === 'weekly' ? 52/12 : 1);
+    const p2m = p2 * (document.getElementById('wiz_p2freq').value === 'fortnightly' ? 26/12 : document.getElementById('wiz_p2freq').value === 'weekly' ? 52/12 : 1);
+    const tm = p1m + p2m;
+    if (tm > 0) {
+      document.getElementById('wiz_split1').value = Math.round(p1m / tm * 100);
+      document.getElementById('wiz_split2').value = Math.round(p2m / tm * 100);
+    }
+  }
+}
+
+function wizSyncSplit(which) {
+  const v = parseInt(document.getElementById('wiz_split' + which).value) || 0;
+  document.getElementById('wiz_split' + (which === 1 ? 2 : 1)).value = 100 - v;
+  wizUpdateSplitPreview();
+}
+
+function wizUpdateSplitPreview() {
+  const s1 = parseInt(document.getElementById('wiz_split1').value) || 0;
+  const s2 = parseInt(document.getElementById('wiz_split2').value) || 0;
+  const total = wizGetBillsTotal();
+  document.getElementById('wiz_splitPreview').textContent = total > 0
+    ? `$${fmt(total)}/mo total — $${fmt(Math.round(total * s1/100))} / $${fmt(Math.round(total * s2/100))}`
+    : 'Add bills in Step 4 to see split preview';
+}
+
+// Wizard bills
+function wizRenderBills(bills) {
+  const el = document.getElementById('wizBillsList');
+  el.innerHTML = bills.map((b, i) => `
+    <div class="list-row" data-bill="${i}">
+      <input class="field-input" style="flex:2" value="${b.name}" placeholder="Bill name" data-field="name" oninput="wizUpdateBillsTotal()">
+      <input class="field-input" style="flex:1" type="number" value="${b.monthly||''}" placeholder="$/month" data-field="monthly" oninput="wizUpdateBillsTotal()">
+      <button class="remove-btn" onclick="this.closest('.list-row').remove();wizUpdateBillsTotal()">x</button>
+    </div>
+  `).join('');
+}
+
+function wizAddBill() {
+  const el = document.getElementById('wizBillsList');
+  const i = el.children.length;
+  el.insertAdjacentHTML('beforeend', `
+    <div class="list-row" data-bill="${i}">
+      <input class="field-input" style="flex:2" value="" placeholder="Bill name" data-field="name" oninput="wizUpdateBillsTotal()">
+      <input class="field-input" style="flex:1" type="number" value="" placeholder="$/month" data-field="monthly" oninput="wizUpdateBillsTotal()">
+      <button class="remove-btn" onclick="this.closest('.list-row').remove();wizUpdateBillsTotal()">x</button>
+    </div>
+  `);
+}
+
+function wizGetBillsTotal() {
+  let total = 0;
+  document.querySelectorAll('#wizBillsList .list-row').forEach(row => {
+    total += parseFloat(row.querySelector('[data-field="monthly"]').value) || 0;
+  });
+  return total;
+}
+
+function wizUpdateBillsTotal() {
+  document.getElementById('wizBillsTotal').textContent = '$' + fmt(wizGetBillsTotal());
+}
+
+// Wizard debts
+function wizRenderDebts(debts) {
+  const el = document.getElementById('wizDebtsList');
+  el.innerHTML = debts.map((d, i) => wizDebtRow(i, d)).join('');
+}
+
+function wizAddDebt() {
+  const el = document.getElementById('wizDebtsList');
+  el.insertAdjacentHTML('beforeend', wizDebtRow(el.children.length, {}));
+}
+
+function wizDebtRow(i, d) {
+  return `<div class="list-row" style="flex-wrap:wrap" data-debt="${i}">
+    <input class="field-input" style="flex:2;min-width:120px" value="${d.name||''}" placeholder="Debt name" data-field="name">
+    <input class="field-input" style="flex:1;min-width:80px" type="number" value="${d.balance||''}" placeholder="Balance $" data-field="balance" oninput="wizUpdateDebtsTotal()">
+    <input class="field-input" style="flex:1;min-width:60px" type="number" value="${d.rate||''}" placeholder="Rate %" data-field="rate" step="0.01">
+    <input class="field-input" style="flex:1;min-width:80px" type="number" value="${d.minPayment||''}" placeholder="Min $/mo" data-field="minPayment">
+    <button class="remove-btn" onclick="this.closest('.list-row').remove();wizUpdateDebtsTotal()">x</button>
+  </div>`;
+}
+
+function wizUpdateDebtsTotal() {
+  let total = 0;
+  document.querySelectorAll('#wizDebtsList .list-row').forEach(row => {
+    total += parseFloat(row.querySelector('[data-field="balance"]').value) || 0;
+  });
+  document.getElementById('wizDebtsTotal').textContent = '$' + fmt(total);
+}
+
+// Wizard goals
+function wizRenderGoals(goals) {
+  const el = document.getElementById('wizGoalsList');
+  el.innerHTML = goals.map((g, i) => wizGoalRow(i, g)).join('');
+}
+
+function wizAddGoal() {
+  const el = document.getElementById('wizGoalsList');
+  el.insertAdjacentHTML('beforeend', wizGoalRow(el.children.length, {}));
+}
+
+function wizGoalRow(i, g) {
+  return `<div class="list-row" style="flex-wrap:wrap" data-goal="${i}">
+    <input class="field-input" style="flex:2;min-width:120px" value="${g.name||''}" placeholder="Goal name" data-field="name">
+    <input class="field-input" style="flex:1;min-width:80px" type="number" value="${g.target||''}" placeholder="Target $" data-field="target">
+    <input class="field-input" style="flex:1;min-width:80px" value="${g.where||''}" placeholder="Where held" data-field="where">
+    <button class="remove-btn" onclick="this.closest('.list-row').remove()">x</button>
+  </div>`;
+}
+
+function collectWizardData() {
+  const p2name = document.getElementById('wiz_p2name').value.trim();
+  const persons = [{
+    name: document.getElementById('wiz_p1name').value.trim(),
+    takeHome: parseFloat(document.getElementById('wiz_p1pay').value) || 0,
+    frequency: document.getElementById('wiz_p1freq').value,
+  }];
+  const p1freq = persons[0].frequency;
+  if (p1freq === 'monthly') {
+    persons[0].payDay = parseInt(document.getElementById('wiz_p1day').value) || 1;
+  } else {
+    persons[0].payDayAnchor = document.getElementById('wiz_p1day').value || new Date().toISOString().slice(0,10);
+  }
+
+  if (p2name) {
+    const p2 = {
+      name: p2name,
+      takeHome: parseFloat(document.getElementById('wiz_p2pay').value) || 0,
+      frequency: document.getElementById('wiz_p2freq').value,
+    };
+    if (p2.frequency === 'monthly') {
+      p2.payDay = parseInt(document.getElementById('wiz_p2day').value) || 1;
+    } else {
+      p2.payDayAnchor = document.getElementById('wiz_p2day').value || new Date().toISOString().slice(0,10);
+    }
+    persons.push(p2);
+  }
+
+  const bills = [];
+  document.querySelectorAll('#wizBillsList .list-row').forEach(row => {
+    const name = row.querySelector('[data-field="name"]').value.trim();
+    const monthly = parseFloat(row.querySelector('[data-field="monthly"]').value) || 0;
+    if (name) bills.push({ id: 'b_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), name, monthly });
+  });
+
+  const debts = [];
+  document.querySelectorAll('#wizDebtsList .list-row').forEach(row => {
+    const name = row.querySelector('[data-field="name"]').value.trim();
+    const balance = parseFloat(row.querySelector('[data-field="balance"]').value) || 0;
+    const rate = parseFloat(row.querySelector('[data-field="rate"]').value) || 0;
+    const minPayment = parseFloat(row.querySelector('[data-field="minPayment"]').value) || 0;
+    if (name && balance > 0) debts.push({ id: 'd_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), name, balance, rate: rate / 100, minPayment });
+  });
+
+  const savingsGoals = [];
+  document.querySelectorAll('#wizGoalsList .list-row').forEach(row => {
+    const name = row.querySelector('[data-field="name"]').value.trim();
+    const target = parseFloat(row.querySelector('[data-field="target"]').value) || 0;
+    const where = row.querySelector('[data-field="where"]').value.trim();
+    if (name) savingsGoals.push({ id: 'g_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), name, target, current: 0, where });
+  });
+
+  return {
+    householdName: document.getElementById('wiz_hhName').value.trim(),
+    persons,
+    splitPercent: [
+      parseInt(document.getElementById('wiz_split1').value) || 50,
+      parseInt(document.getElementById('wiz_split2').value) || 50,
+    ],
+    bills,
+    debts,
+    savingsGoals,
+    accountLabels: {},
+  };
+}
+
+async function finishWizard() {
+  const settings = collectWizardData();
+  household.settings = settings;
+  household.state = { balances: {}, months: {}, windfalls: {} };
+
+  // Init debt balances from settings
+  if (settings.debts.length) {
+    household.state.balances.debtBalances = settings.debts.map(d => d.balance);
+  }
+
+  const { error } = await sb
+    .from('households')
+    .update({ name: settings.householdName, settings, state: household.state, updated_at: new Date().toISOString() })
+    .eq('id', household.id);
+
+  if (error) { document.getElementById('wizErr').textContent = error.message; return; }
+
+  // Generate invite code
+  const { data: code } = await sb.rpc('generate_invite_code', { p_household_id: household.id });
+  if (code) {
+    document.getElementById('inviteCodeDisplay').textContent = code;
+    showScreen('invite');
+  } else {
+    showScreen('app');
+    initApp();
+  }
+}
+
+// ════════════════════════════════════════
+// DATA LAYER
+// ════════════════════════════════════════
+async function saveState() {
+  if (!household) return;
+  setSyncStatus('syncing');
+  const { error } = await sb
+    .from('households')
+    .update({ state: household.state, updated_at: new Date().toISOString() })
+    .eq('id', household.id);
+  setSyncStatus(error ? 'error' : 'synced');
+}
+
+async function saveSettings() {
+  if (!household) return;
+  setSyncStatus('syncing');
+  const { error } = await sb
+    .from('households')
+    .update({ settings: household.settings, updated_at: new Date().toISOString() })
+    .eq('id', household.id);
   setSyncStatus(error ? 'error' : 'synced');
 }
 
@@ -863,151 +909,375 @@ function debounceSave() {
 
 function setSyncStatus(status) {
   const dot = document.getElementById('syncDot');
-  dot.className = 'sync-dot ' + status;
+  if (dot) dot.className = 'sync-dot ' + status;
 }
 
-// ── HELPERS ──
-function monthKey() { return `${currentYear}-${String(currentMonth+1).padStart(2,'0')}`; }
+// ════════════════════════════════════════
+// DERIVED CALCULATIONS (pure functions)
+// ════════════════════════════════════════
+function monthlyIncome(person) {
+  if (!person) return 0;
+  if (person.frequency === 'fortnightly') return person.takeHome * 26 / 12;
+  if (person.frequency === 'weekly') return person.takeHome * 52 / 12;
+  return person.takeHome;
+}
+
+function combinedMonthly(s) {
+  return (s.persons || []).reduce((sum, p) => sum + monthlyIncome(p), 0);
+}
+
+function totalBillsMonthly(s) {
+  return (s.bills || []).reduce((sum, b) => sum + (b.monthly || 0), 0);
+}
+
+function personBillShare(s, idx) {
+  return totalBillsMonthly(s) * (s.splitPercent?.[idx] || 50) / 100;
+}
+
+function billTransferPerPay(s, idx) {
+  const share = personBillShare(s, idx);
+  const p = s.persons?.[idx];
+  if (!p) return share;
+  if (p.frequency === 'fortnightly') return share * 12 / 26;
+  if (p.frequency === 'weekly') return share * 12 / 52;
+  return share;
+}
+
+function debtBalance(s, st, index) {
+  const live = st.balances?.debtBalances?.[index];
+  return live != null ? live : (s.debts?.[index]?.balance || 0);
+}
+
+function totalDebt(s, st) {
+  return (s.debts || []).reduce((sum, d, i) => sum + debtBalance(s, st, i), 0);
+}
+
+function monthlyInterest(balance, annualRate) {
+  return Math.round(balance * annualRate / 12);
+}
+
+function totalMonthlyInterest(s, st) {
+  return (s.debts || []).reduce((sum, d, i) => sum + monthlyInterest(debtBalance(s, st, i), d.rate), 0);
+}
+
+function totalMinPayments(s) {
+  return (s.debts || []).reduce((sum, d) => sum + (d.minPayment || 0), 0);
+}
+
+function goalBalance(st, goalId) {
+  return st.balances?.[goalId] || 0;
+}
+
+function goalProgress(goal, st) {
+  const current = goalBalance(st, goal.id);
+  return { current, target: goal.target || 0, pct: goal.target > 0 ? Math.min(100, Math.round(current / goal.target * 100)) : 0 };
+}
+
+function payDatesInMonth(person, year, month) {
+  if (!person) return [];
+  if (person.frequency === 'monthly') {
+    return [new Date(year, month, person.payDay || 1)];
+  }
+  const interval = person.frequency === 'fortnightly' ? 14 : 7;
+  const anchor = new Date(person.payDayAnchor || new Date().toISOString().slice(0,10));
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month + 1, 0);
+  const dates = [];
+  let d = new Date(anchor);
+  while (d > first) d = new Date(d.getTime() - interval * 86400000);
+  while (d <= last) {
+    if (d >= first) dates.push(new Date(d));
+    d = new Date(d.getTime() + interval * 86400000);
+  }
+  return dates;
+}
+
+function payDayAllocations(s, personIndex) {
+  const p = s.persons?.[personIndex];
+  if (!p) return { takeHome: 0, billsTransfer: 0, everyday: 0 };
+  const billsTransfer = Math.round(billTransferPerPay(s, personIndex));
+  return {
+    takeHome: p.takeHome,
+    billsTransfer,
+    everyday: p.takeHome - billsTransfer,
+  };
+}
+
+// ════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════
+function fmt(n) { return Math.round(n).toLocaleString('en-AU'); }
+function fmtDate(d) { return d.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' }); }
+function fmtKey(d) { return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); }
+function monthKey() { return currentYear + '-' + String(currentMonth + 1).padStart(2, '0'); }
+function monthLabel() { return new Date(currentYear, currentMonth, 1).toLocaleDateString('en-AU', { month: 'long', year: 'numeric' }); }
+
 function getMonthState(key) {
-  if (!appState.months) appState.months = {};
-  if (!appState.months[monthKey()]) appState.months[monthKey()] = {};
-  return appState.months[monthKey()][key] || {};
+  if (!household.state.months) household.state.months = {};
+  const mk = monthKey();
+  if (!household.state.months[mk]) household.state.months[mk] = {};
+  return household.state.months[mk][key] || {};
 }
+
 function setMonthState(key, val) {
-  if (!appState.months) appState.months = {};
-  if (!appState.months[monthKey()]) appState.months[monthKey()] = {};
-  appState.months[monthKey()][key] = val;
+  if (!household.state.months) household.state.months = {};
+  const mk = monthKey();
+  if (!household.state.months[mk]) household.state.months[mk] = {};
+  household.state.months[mk][key] = val;
   debounceSave();
 }
 
-function saveVal(key, raw) {
-  const val = parseFloat(raw)||0;
-  if (!appState.global) appState.global = {};
-  appState.global[key] = val;
-  debounceSave();
-  refreshGlobalDisplays();
+// ════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════
+function buildTabs() {
+  const s = household.settings;
+  const tabs = [
+    { id: 'dashboard', label: 'Dashboard' },
+    { id: 'budget', label: 'Budget & Bills' },
+  ];
+  if (s.debts?.length) tabs.push({ id: 'debt', label: 'Debt' });
+  if (s.savingsGoals?.length) tabs.push({ id: 'goals', label: 'Goals' });
+  tabs.push({ id: 'networth', label: 'Net Worth' });
+  tabs.push({ id: 'windfalls', label: 'Windfalls' });
+  tabs.push({ id: 'checklist', label: 'Checklist' });
+  tabs.push({ id: 'settings', label: 'Settings' });
+
+  document.getElementById('tabBar').innerHTML = tabs.map((t, i) =>
+    `<div class="tab${i === 0 ? ' active' : ''}" onclick="showTab('${t.id}',this)">${t.label}</div>`
+  ).join('');
 }
 
-function saveDebtBal(idx, raw) {
-  const val = parseFloat(raw)||0;
-  if (!appState.global) appState.global = {};
-  if (!appState.global.debtBals) appState.global.debtBals = [...DEBT_STARTING];
-  appState.global.debtBals[idx] = val;
-  debounceSave();
-  refreshDebtDisplays();
+function showTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const panel = document.getElementById('panel-' + id);
+  if (panel) panel.classList.add('active');
+
+  const renderers = { dashboard: renderDashboard, budget: renderBudget, debt: renderDebt, goals: renderGoals, networth: renderNetWorth, windfalls: renderWindfalls, checklist: renderChecklist, settings: renderSettings };
+  if (renderers[id]) renderers[id]();
 }
 
-function g(key, def=0) { return (appState.global && appState.global[key] != null) ? appState.global[key] : def; }
-
-// ── MONTH NAVIGATION ──
+// ════════════════════════════════════════
+// MONTH NAVIGATION
+// ════════════════════════════════════════
 function changeMonth(dir) {
   currentMonth += dir;
   if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-  if (currentMonth < 0)  { currentMonth = 11; currentYear--; }
-  refreshMonthLabels();
-  renderBudget();
-  renderChecklist();
+  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+  // Re-render active panel
+  const active = document.querySelector('.panel.active');
+  if (active) {
+    const id = active.id.replace('panel-', '');
+    const renderers = { dashboard: renderDashboard, budget: renderBudget, checklist: renderChecklist };
+    if (renderers[id]) renderers[id]();
+  }
 }
 
-function refreshMonthLabels() {
-  const d = new Date(currentYear, currentMonth, 1);
-  const label = d.toLocaleDateString('en-AU',{month:'long',year:'numeric'});
-  ['mnLabel','budgetMonthLabel','checkMonthLabel'].forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.textContent = label;
+function buildMonthNav() {
+  return `<div class="month-nav">
+    <button class="mn-btn" onclick="changeMonth(-1)">&larr; prev</button>
+    <div class="mn-label">${monthLabel()}</div>
+    <button class="mn-btn" onclick="changeMonth(1)">next &rarr;</button>
+  </div>`;
+}
+
+// ════════════════════════════════════════
+// RENDERER — HUD
+// ════════════════════════════════════════
+function renderHUD() {
+  const s = household.settings;
+  const st = household.state;
+
+  // Brand
+  const brand = s.householdName || 'HouseholdOS';
+  document.getElementById('hudBrand').textContent = brand.length > 12 ? brand.split(/[\s&]+/).map(w => w[0]).join('&') : brand;
+  document.title = (s.householdName || 'HouseholdOS') + ' — Finance';
+
+  // Stats
+  const stats = [];
+  stats.push({ label: 'Combined income', value: '$' + fmt(combinedMonthly(s)) + '/mo', cls: 'color:var(--brass)' });
+
+  if (s.debts?.length) {
+    stats.push({ label: 'Total debt', value: '$' + fmt(totalDebt(s, st)), cls: 'color:var(--danger)' });
+    stats.push({ label: 'Monthly interest', value: '$' + fmt(totalMonthlyInterest(s, st)) + '/mo', cls: 'color:var(--warn)' });
+  }
+
+  (s.savingsGoals || []).forEach(goal => {
+    const p = goalProgress(goal, st);
+    stats.push({ label: goal.name, value: '$' + fmt(p.current), cls: p.pct >= 50 ? 'color:var(--good)' : 'color:var(--danger)' });
   });
-  // phase
-  const phaseText = getPhaseLabel(d);
-  const pb = document.getElementById('dashPhase');
-  if(pb) pb.textContent = phaseText;
-  const mn = document.getElementById('mnPhase');
-  if(mn) mn.textContent = phaseText;
+
+  document.getElementById('hudStats').innerHTML = stats.map(s =>
+    `<div class="hud-stat"><div class="hs-label">${s.label}</div><div class="hs-value" style="${s.cls}">${s.value}</div></div>`
+  ).join('');
+
+  document.getElementById('hudUserEmail').textContent = membership?.display_name || currentUser?.email?.split('@')[0] || '';
 }
 
-function getPhaseLabel(d) {
-  const t = d.getTime();
-  if (t < new Date(2026,4,1).getTime()) return 'Phase 1 — Survive the Move';
-  if (t < new Date(2026,11,1).getTime()) return 'Phase 2 — Wedding Mode';
-  if (t < new Date(2029,0,1).getTime()) return 'Phase 3 — Debt Assault';
-  return 'Phase 4 — Wealth Building';
+// ════════════════════════════════════════
+// RENDERER — DASHBOARD
+// ════════════════════════════════════════
+function renderDashboard() {
+  const s = household.settings;
+  const st = household.state;
+  const mk = monthKey();
+  const mState = st.months?.[mk] || {};
+
+  let html = buildMonthNav();
+  html += `<div class="sec-head"><h2>Dashboard</h2><span class="sh-sub">${s.householdName || ''}</span></div>`;
+
+  // Income cards
+  html += '<div class="grid' + (s.persons.length + 1) + '" style="margin-bottom:12px">';
+  s.persons.forEach((p, i) => {
+    const mo = monthlyIncome(p);
+    const freqNote = p.frequency === 'monthly' ? 'monthly' : p.frequency + ' &middot; ~$' + fmt(mo) + '/mo';
+    html += `<div class="card brass-accent">
+      <div class="c-label">${p.name} take-home</div>
+      <div class="c-value" style="color:var(--person${i+1});font-size:1.2rem">$${fmt(p.takeHome)}</div>
+      <div class="c-sub">${freqNote}</div>
+    </div>`;
+  });
+  html += `<div class="card brass-accent">
+    <div class="c-label">Combined monthly</div>
+    <div class="c-value" style="color:var(--brass);font-size:1.2rem">$${fmt(combinedMonthly(s))}</div>
+    <div class="c-sub">${s.splitPercent[0]}/${s.splitPercent[1]} split</div>
+  </div>`;
+  html += '</div>';
+
+  // Debt + Goals summary
+  if (s.debts?.length || s.savingsGoals?.length) {
+    const cols = [];
+    if (s.debts?.length) {
+      cols.push(`<div class="card rose-accent">
+        <div class="c-label">Total debt</div>
+        <div class="c-value" style="color:var(--danger);font-size:1.2rem">$${fmt(totalDebt(s, st))}</div>
+        <div class="c-sub">$${fmt(totalMonthlyInterest(s, st))}/mo interest &middot; $${fmt(totalMinPayments(s))}/mo payments</div>
+      </div>`);
+    }
+    (s.savingsGoals || []).forEach(goal => {
+      const p = goalProgress(goal, st);
+      cols.push(`<div class="card sage-accent">
+        <div class="c-label">${goal.name}</div>
+        <div class="c-value" style="font-size:1.2rem;color:${p.pct >= 50 ? 'var(--good)' : 'var(--danger)'}">$${fmt(p.current)}</div>
+        <div class="prog-wrap"><div class="prog-label"><span>target $${fmt(p.target)}</span><span>${p.pct}%</span></div>
+        <div class="prog-track"><div class="prog-fill" style="width:${p.pct}%;background:var(--sage)"></div></div></div>
+      </div>`);
+    });
+    html += `<div class="grid${Math.min(cols.length, 4)}" style="margin-bottom:12px">${cols.join('')}</div>`;
+  }
+
+  // Pay day status
+  html += '<div class="card" style="margin-bottom:12px"><div class="c-label">Pay day status — ' + monthLabel() + '</div>';
+  s.persons.forEach((p, i) => {
+    const dates = payDatesInMonth(p, currentYear, currentMonth);
+    const payState = mState.pay || {};
+    const allDone = dates.every(d => payState['p' + i + '_' + fmtKey(d)]);
+    html += `<div class="stat-row">
+      <span class="sr-label">${p.name}</span>
+      <span class="sr-value" style="color:${allDone ? 'var(--good)' : 'var(--warn)'}">${allDone ? 'All pays marked' : dates.filter(d => payState['p' + i + '_' + fmtKey(d)]).length + ' of ' + dates.length + ' pays marked'}</span>
+    </div>`;
+  });
+  html += '</div>';
+
+  // Bills status
+  const billState = mState.bills || {};
+  const paidCount = (s.bills || []).filter(b => billState[b.id]).length;
+  html += `<div class="card"><div class="c-label">Bills — ${monthLabel()}</div>
+    <div class="stat-row"><span class="sr-label">Bills paid</span><span class="sr-value" style="color:${paidCount === (s.bills||[]).length ? 'var(--good)' : 'var(--warn)'}">${paidCount} of ${(s.bills||[]).length}</span></div>
+    <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" style="width:${(s.bills||[]).length > 0 ? paidCount/(s.bills||[]).length*100 : 0}%;background:var(--good)"></div></div></div>
+  </div>`;
+
+  document.getElementById('panel-dashboard').innerHTML = html;
 }
 
-// ── JACYNTA PAY DATES ──
-function getJacyntaDates(year, month) {
-  const anchor = new Date(2026,2,11);
-  const first = new Date(year,month,1), last = new Date(year,month+1,0);
-  const dates = [];
-  let d = new Date(anchor);
-  while(d > first) d = new Date(d.getTime()-14*86400000);
-  while(d <= last) { if(d >= first) dates.push(new Date(d)); d = new Date(d.getTime()+14*86400000); }
-  return dates;
-}
-function fmtDate(d){ return d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'}); }
-function fmtKey(d){ return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
-
-// ── TABS ──
-function showTab(id, el) {
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  if(el) el.classList.add('active');
-  document.getElementById('panel-'+id).classList.add('active');
-  if(id==='budget') renderBudget();
-  if(id==='checklist') renderChecklist();
-  if(id==='windfalls') renderWindfalls();
-}
-
-// ── BUDGET ──
+// ════════════════════════════════════════
+// RENDERER — BUDGET & BILLS
+// ════════════════════════════════════════
 function renderBudget() {
-  const billState = getMonthState('bills');
-  const payState  = getMonthState('pay');
+  const s = household.settings;
+  const st = household.state;
+  const mk = monthKey();
+  const mState = st.months?.[mk] || {};
+  const billState = mState.bills || {};
+  const payState = mState.pay || {};
 
-  // Liam
-  document.getElementById('liamPayRows').innerHTML = `
-    <div class="pay-row" onclick="togglePay('liam_14')">
-      <div class="pr-date">14th — monthly</div>
-      <div class="pr-amt" style="color:var(--liam)">$2,820</div>
-      <div class="pr-status ${payState['liam_14']?'done':'pend'}">${payState['liam_14']?'✓ done':'pending'}</div>
+  let html = buildMonthNav();
+  html += `<div class="sec-head"><h2>Budget & Bills</h2><span class="sh-sub">${s.splitPercent[0]}/${s.splitPercent[1]} split</span></div>`;
+
+  // Person pay cards
+  html += '<div class="grid2" style="margin-bottom:16px">';
+  s.persons.forEach((p, i) => {
+    const transfer = billTransferPerPay(s, i);
+    const dates = payDatesInMonth(p, currentYear, currentMonth);
+    const alloc = payDayAllocations(s, i);
+
+    html += `<div class="card" style="border-left:3px solid var(--person${i+1})">
+      <div class="c-label">${p.name} &middot; ${p.frequency}</div>
+      <div class="c-value" style="color:var(--person${i+1});font-size:1.1rem">$${fmt(transfer)}</div>
+      <div class="c-sub" style="margin-bottom:10px">bills transfer per pay &middot; $${fmt(alloc.everyday)} everyday</div>`;
+
+    dates.forEach(d => {
+      const k = 'p' + i + '_' + fmtKey(d);
+      const done = !!payState[k];
+      html += `<div class="pay-row" onclick="togglePay('${k}')">
+        <div class="pr-date">${fmtDate(d)}</div>
+        <div class="pr-amt" style="color:var(--person${i+1})">$${fmt(p.takeHome)}</div>
+        <div class="pr-status ${done ? 'done' : 'pend'}">${done ? 'done' : 'pending'}</div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // Bills table
+  const gridCols = '2fr 75px' + s.persons.map(() => ' 75px').join('') + ' 85px';
+  html += `<div class="bills-table">
+    <div class="bt-head" style="grid-template-columns:${gridCols}">
+      <span>Bill</span><span>Monthly</span>
+      ${s.persons.map((p, i) => `<span>${p.name} ${s.splitPercent[i]}%</span>`).join('')}
+      <span>Status</span>
     </div>`;
 
-  // Jacynta
-  const jDates = getJacyntaDates(currentYear, currentMonth);
-  document.getElementById('jacyntaPayRows').innerHTML = jDates.map(d=>{
-    const k = 'jac_'+fmtKey(d);
-    const done = !!payState[k];
-    return `<div class="pay-row" onclick="togglePay('${k}')">
-      <div class="pr-date">${fmtDate(d)}</div>
-      <div class="pr-amt" style="color:var(--jacynta)">$658</div>
-      <div class="pr-status ${done?'done':'pend'}">${done?'✓ done':'pending'}</div>
-    </div>`;
-  }).join('');
-
-  // Bills
-  document.getElementById('billsRows').innerHTML = BILLS.map((b,i)=>{
-    const paid = !!billState[i];
-    return `<div class="bt-row">
-      <div><div class="btr-name">${b.name}</div>${b.sub?`<div class="btr-sub">${b.sub}</div>`:''}</div>
-      <div class="btr-amt">$${Math.round(b.amt).toLocaleString('en-AU')}</div>
-      <div class="btr-liam">$${Math.round(b.amt*0.65).toLocaleString('en-AU')}</div>
-      <div class="btr-jac">$${Math.round(b.amt*0.35).toLocaleString('en-AU')}</div>
-      <div class="tog ${paid?'on':''}" onclick="toggleBill(${i})">
-        <div class="tog-box ${paid?'on':''}">${paid?'✓':''}</div>
-        <div class="tog-label">${paid?'paid':'unpaid'}</div>
+  (s.bills || []).forEach(b => {
+    const paid = !!billState[b.id];
+    html += `<div class="bt-row" style="grid-template-columns:${gridCols}">
+      <div class="btr-name">${b.name}</div>
+      <div class="btr-amt">$${fmt(b.monthly)}</div>
+      ${s.persons.map((_, pi) => `<div class="btr-p${pi+1}">$${fmt(Math.round(b.monthly * s.splitPercent[pi] / 100))}</div>`).join('')}
+      <div class="tog ${paid ? 'on' : ''}" onclick="toggleBill('${b.id}')">
+        <div class="tog-box ${paid ? 'on' : ''}">${paid ? '&#10003;' : ''}</div>
+        <div class="tog-label">${paid ? 'paid' : 'unpaid'}</div>
       </div>
     </div>`;
-  }).join('');
+  });
 
-  // Totals
-  const liamIn  = payState['liam_14'] ? 2820 : 0;
-  const jacIn   = jDates.filter(d=>payState['jac_'+fmtKey(d)]).length * 658;
-  const paidOut = BILLS.filter((_,i)=>billState[i]).reduce((s,b)=>s+b.amt,0);
-  const bal     = liamIn + jacIn - paidOut;
+  const totalB = totalBillsMonthly(s);
+  html += `<div class="bt-total" style="grid-template-columns:${gridCols}">
+    <span style="font-size:0.6rem;color:var(--text-dim)">Monthly total</span>
+    <span class="btt-v">$${fmt(totalB)}</span>
+    ${s.persons.map((_, i) => `<span class="btt-v" style="color:var(--person${i+1})">$${fmt(personBillShare(s, i))}</span>`).join('')}
+    <span></span>
+  </div></div>`;
 
-  document.getElementById('bLiamIn').textContent = '$'+liamIn.toLocaleString('en-AU');
-  document.getElementById('bJacIn').textContent  = '$'+jacIn.toLocaleString('en-AU');
-  document.getElementById('bOut').textContent    = '$'+Math.round(paidOut).toLocaleString('en-AU');
-  document.getElementById('bBal').textContent    = (bal<0?'-':'')+'$'+Math.abs(Math.round(bal)).toLocaleString('en-AU');
-  document.getElementById('bBal').style.color    = bal<0?'var(--danger)':'var(--good)';
-  document.getElementById('bBalSub').textContent = bal<0?'⚠️ top up needed':'looking good';
+  // Summary cards
+  html += '<div class="divider"></div><div class="grid4">';
+  let totalPaidIn = 0;
+  s.persons.forEach((p, i) => {
+    const dates = payDatesInMonth(p, currentYear, currentMonth);
+    const paid = dates.filter(d => payState['p' + i + '_' + fmtKey(d)]).length;
+    const amt = paid * billTransferPerPay(s, i);
+    totalPaidIn += amt;
+    html += `<div class="card"><div class="c-label">${p.name} transferred</div><div class="c-value" style="font-size:1.1rem;color:var(--person${i+1})">$${fmt(amt)}</div><div class="c-sub">of $${fmt(personBillShare(s, i))}</div></div>`;
+  });
+  const paidOut = (s.bills || []).filter(b => billState[b.id]).reduce((sum, b) => sum + b.monthly, 0);
+  const bal = totalPaidIn - paidOut;
+  html += `<div class="card"><div class="c-label">Bills paid out</div><div class="c-value" style="font-size:1.1rem">$${fmt(paidOut)}</div><div class="c-sub">of $${fmt(totalB)}</div></div>`;
+  html += `<div class="card"><div class="c-label">Account balance</div><div class="c-value" style="font-size:1.1rem;color:${bal < 0 ? 'var(--danger)' : 'var(--good)'}">$${fmt(Math.abs(bal))}</div><div class="c-sub">${bal < 0 ? 'top up needed' : 'looking good'}</div></div>`;
+  html += '</div>';
+
+  document.getElementById('panel-budget').innerHTML = html;
 }
 
 function togglePay(key) {
@@ -1015,123 +1285,287 @@ function togglePay(key) {
   s[key] = !s[key];
   setMonthState('pay', s);
   renderBudget();
+  renderDashboard();
 }
 
-function toggleBill(i) {
+function toggleBill(id) {
   const s = getMonthState('bills');
-  s[i] = !s[i];
+  s[id] = !s[id];
   setMonthState('bills', s);
   renderBudget();
+  renderDashboard();
 }
 
-// ── DEBT ──
-function refreshDebtDisplays() {
-  const bals = (appState.global && appState.global.debtBals) ? appState.global.debtBals : [...DEBT_STARTING];
-  const ids = ['d1bal','d2bal','d3bal','d4bal'];
-  ids.forEach((id,i) => {
-    const el = document.getElementById(id);
-    if(el && el !== document.activeElement) el.value = bals[i] || '';
+// ════════════════════════════════════════
+// RENDERER — DEBT TRACKER
+// ════════════════════════════════════════
+function renderDebt() {
+  const s = household.settings;
+  const st = household.state;
+
+  if (!s.debts?.length) {
+    document.getElementById('panel-debt').innerHTML = '<div class="sec-head"><h2>Debt Tracker</h2></div><div class="note">No debts configured. Add debts in Settings.</div>';
+    return;
+  }
+
+  const sorted = s.debts.map((d, i) => ({ ...d, origIdx: i })).sort((a, b) => b.rate - a.rate);
+  const td = totalDebt(s, st);
+  const ti = totalMonthlyInterest(s, st);
+  const tp = totalMinPayments(s);
+
+  let html = `<div class="sec-head"><h2>Debt Tracker</h2><span class="sh-sub">avalanche method &middot; $${fmt(tp)}/mo</span></div>`;
+
+  html += `<div class="grid3" style="margin-bottom:16px">
+    <div class="card rose-accent"><div class="c-label">Total debt</div><div class="c-value" style="color:var(--danger);font-size:1.2rem">$${fmt(td)}</div><div class="c-sub">${s.debts.length} debts</div></div>
+    <div class="card rose-accent"><div class="c-label">Monthly interest</div><div class="c-value" style="color:var(--warn);font-size:1.2rem">$${fmt(ti)}</div><div class="c-sub">$${fmt(ti * 12)}/year</div></div>
+    <div class="card rose-accent"><div class="c-label">Combined payments</div><div class="c-value" style="font-size:1.2rem">$${fmt(tp)}</div><div class="c-sub">per month</div></div>
+  </div>`;
+
+  // Balance inputs
+  html += '<div class="note" style="margin-bottom:14px"><strong>Update balances monthly</strong> after each statement to track real progress.</div>';
+  html += '<div class="grid' + Math.min(s.debts.length, 4) + '" style="margin-bottom:16px">';
+  s.debts.forEach((d, i) => {
+    const bal = debtBalance(s, st, i);
+    html += `<div class="field-group"><div class="field-label">${d.name}</div><input class="field-input" type="number" value="${bal}" oninput="saveDebtBal(${i},this.value)"></div>`;
+  });
+  html += '</div>';
+
+  // Debt cards
+  let rollup = 0;
+  sorted.forEach((d, si) => {
+    const bal = debtBalance(s, st, d.origIdx);
+    const interest = monthlyInterest(bal, d.rate);
+    const startBal = d.balance || bal;
+    const pct = startBal > 0 ? Math.max(0, Math.round((1 - bal / startBal) * 100)) : 0;
+    const attack = d.minPayment + rollup;
+
+    html += `<div class="debt-card">
+      <div class="dc-top">
+        <div class="dc-badge" style="background:var(--rose-dim);color:var(--danger);border:1px solid var(--danger)">${si + 1}</div>
+        <div><div class="dc-name">${d.name}</div><div class="dc-sub">${(d.rate * 100).toFixed(1)}% p.a.</div></div>
+        <div><div class="dc-bal" style="color:var(--danger)">$${fmt(bal)}</div></div>
+      </div>
+      <div class="prog-track" style="margin-bottom:10px"><div class="prog-fill" style="width:${pct}%;background:var(--danger)"></div></div>
+      <div class="dc-stats">
+        <div class="dc-stat"><div class="dcs-label">Min payment</div><div class="dcs-val">$${fmt(d.minPayment)}/mo</div></div>
+        <div class="dc-stat"><div class="dcs-label">After roll-up</div><div class="dcs-val">$${fmt(attack)}/mo</div></div>
+        <div class="dc-stat"><div class="dcs-label">Monthly interest</div><div class="dcs-val">~$${fmt(interest)}</div></div>
+      </div>
+    </div>`;
+
+    rollup += d.minPayment;
+    if (si < sorted.length - 1) {
+      html += `<div class="rollup">&darr; $${fmt(d.minPayment)} rolls to ${sorted[si + 1].name} &middot; attack becomes <span>$${fmt(rollup + sorted[si + 1].minPayment)}/mo</span></div>`;
+    }
   });
 
-  const dcBals = ['dc1bal','dc2bal','dc3bal','dc4bal'];
-  const dcInts = ['dc1int','dc2int','dc3int','dc4int'];
-  const dcProgs = ['dc1prog','dc2prog','dc3prog','dc4prog'];
-
-  bals.forEach((bal,i) => {
-    const b = bal || 0;
-    const start = DEBT_STARTING[i];
-    const interest = Math.round(b * DEBT_RATES[i] / 12);
-    const pct = Math.max(0, Math.round((1 - b/start)*100));
-
-    const balEl = document.getElementById(dcBals[i]);
-    const intEl = document.getElementById(dcInts[i]);
-    const progEl = document.getElementById(dcProgs[i]);
-    if(balEl) balEl.textContent = '$'+b.toLocaleString('en-AU');
-    if(intEl) intEl.textContent = '~$'+interest;
-    if(progEl) progEl.style.width = pct+'%';
-  });
-
-  const total = bals.reduce((s,b)=>s+(b||0),0);
-  const totalInt = bals.reduce((s,b,i)=>s+Math.round((b||0)*DEBT_RATES[i]/12),0);
-  const el1 = document.getElementById('debtTotal'); if(el1) el1.textContent = '$'+Math.round(total).toLocaleString('en-AU');
-  const el2 = document.getElementById('debtInterest'); if(el2) el2.textContent = '$'+totalInt;
-  const el3 = document.getElementById('hudDebt'); if(el3) el3.textContent = '$'+Math.round(total).toLocaleString('en-AU');
-  const el4 = document.getElementById('dDebt'); if(el4) el4.textContent = '$'+Math.round(total).toLocaleString('en-AU');
-  const el5 = document.getElementById('dInterest'); if(el5) el5.textContent = '$'+totalInt;
-
-  // NW debt rows
-  ['nwD1','nwD2','nwD3','nwD4'].forEach((id,i)=>{
-    const el = document.getElementById(id);
-    if(el) el.textContent = '$'+(bals[i]||0).toLocaleString('en-AU');
-  });
+  document.getElementById('panel-debt').innerHTML = html;
 }
 
-// ── GLOBAL DISPLAYS ──
-function refreshGlobalDisplays() {
-  const wf = g('weddingFund');
-  const ff = g('fireFund');
-  const hd = g('houseDeposit');
-
-  // Wedding
-  const wfFmt = '$'+Math.round(wf).toLocaleString('en-AU');
-  ['wfDisplay','dWedding'].forEach(id=>{ const el=document.getElementById(id); if(el){el.textContent=wfFmt; el.style.color=wf>0?'var(--good)':'var(--danger)';} });
-  document.getElementById('hudWedding').textContent = wfFmt;
-  const wfPct = Math.min(100,Math.round(wf/11955*100));
-  ['wfPct','dWedPct'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=wfPct+'%'; });
-  ['wfProg','dWedProg'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.width=wfPct+'%'; });
-  if(wf>0) document.getElementById('wfSub').textContent = `$${Math.round(11955-wf).toLocaleString('en-AU')} to go`;
-
-  // Fire Fund
-  const ffFmt = '$'+Math.round(ff).toLocaleString('en-AU');
-  ['ffDisplay','dFire'].forEach(id=>{ const el=document.getElementById(id); if(el){el.textContent=ffFmt; el.style.color=ff>=2000?'var(--good)':'var(--danger)';} });
-  document.getElementById('hudFire').textContent = ffFmt;
-  document.getElementById('hudFire').style.color = ff>=2000?'var(--good)':'var(--danger)';
-  const ffEl = document.getElementById('ffProg3'); if(ffEl) ffEl.style.width=Math.min(100,ff/16165*100)+'%';
-  const ff6El = document.getElementById('ffProg6'); if(ff6El) ff6El.style.width=Math.min(100,ff/32329*100)+'%';
-  const dFireProg = document.getElementById('dFireProg'); if(dFireProg) dFireProg.style.width=Math.min(100,ff/16165*100)+'%';
-
-  // House deposit
-  const hdFmt = '$'+Math.round(hd).toLocaleString('en-AU');
-  ['hdDisplay','dDeposit'].forEach(id=>{ const el=document.getElementById(id); if(el){el.textContent=hdFmt; el.style.color=hd>0?'var(--good)':'var(--danger)';} });
-  const hdPct100 = Math.min(100,Math.round(hd/100000*100));
-  const hdPct150 = Math.min(100,Math.round(hd/150000*100));
-  ['hdPct100','dDepPct'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=hdPct100+'%'; });
-  document.getElementById('hdPct150').textContent = hdPct150+'%';
-  ['hdProg100','dDepProg'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.width=hdPct100+'%'; });
-  document.getElementById('hdProg150').style.width=hdPct150+'%';
-
-  // Populate inputs without overriding active focus
-  [['ffInput',ff],['hdInput',hd],['wfInput',wf]].forEach(([id,val])=>{
-    const el=document.getElementById(id); if(el && el!==document.activeElement && val) el.value=val;
-  });
-
-  // NW
-  document.getElementById('nwFF').textContent='$'+Math.round(ff).toLocaleString('en-AU');
-  document.getElementById('nwHD').textContent='$'+Math.round(hd).toLocaleString('en-AU');
-  document.getElementById('nwWF').textContent='$'+Math.round(wf).toLocaleString('en-AU');
+function saveDebtBal(idx, raw) {
+  const val = parseFloat(raw) || 0;
+  if (!household.state.balances) household.state.balances = {};
+  if (!household.state.balances.debtBalances) {
+    household.state.balances.debtBalances = (household.settings.debts || []).map(d => d.balance);
+  }
+  household.state.balances.debtBalances[idx] = val;
+  debounceSave();
+  renderHUD();
 }
 
-// ── CHECKLIST ──
+// ════════════════════════════════════════
+// RENDERER — GOALS
+// ════════════════════════════════════════
+function renderGoals() {
+  const s = household.settings;
+  const st = household.state;
+  const goals = s.savingsGoals || [];
+
+  if (!goals.length) {
+    document.getElementById('panel-goals').innerHTML = '<div class="sec-head"><h2>Savings Goals</h2></div><div class="note">No goals configured. Add goals in Settings.</div>';
+    return;
+  }
+
+  let html = '<div class="sec-head"><h2>Savings Goals</h2></div>';
+  html += '<div class="grid2" style="margin-bottom:16px">';
+
+  goals.forEach(goal => {
+    const p = goalProgress(goal, st);
+    const color = p.pct >= 80 ? 'var(--good)' : p.pct >= 40 ? 'var(--warn)' : 'var(--danger)';
+    html += `<div class="card sage-accent">
+      <div class="c-label">${goal.name}${goal.where ? ' &middot; ' + goal.where : ''}</div>
+      <div class="c-value" style="color:${color};font-size:1.2rem">$${fmt(p.current)}</div>
+      <div class="field-group" style="margin:10px 0 8px">
+        <div class="field-label">Update balance</div>
+        <input class="field-input" type="number" value="${p.current || ''}" oninput="saveGoalBal('${goal.id}',this.value)">
+      </div>
+      <div class="prog-wrap">
+        <div class="prog-label"><span>target $${fmt(p.target)}</span><span>${p.pct}%</span></div>
+        <div class="prog-track"><div class="prog-fill" style="width:${p.pct}%;background:var(--sage)"></div></div>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('panel-goals').innerHTML = html;
+}
+
+function saveGoalBal(goalId, raw) {
+  const val = parseFloat(raw) || 0;
+  if (!household.state.balances) household.state.balances = {};
+  household.state.balances[goalId] = val;
+  debounceSave();
+  renderHUD();
+}
+
+// ════════════════════════════════════════
+// RENDERER — NET WORTH
+// ════════════════════════════════════════
+function renderNetWorth() {
+  const s = household.settings;
+  const st = household.state;
+
+  let html = '<div class="sec-head"><h2>Net Worth</h2><span class="sh-sub">update quarterly</span></div>';
+  html += '<div class="grid2">';
+
+  // Assets
+  html += '<div class="card"><div class="nw-head">Assets</div>';
+  let totalAssets = 0;
+  (s.savingsGoals || []).forEach(goal => {
+    const bal = goalBalance(st, goal.id);
+    totalAssets += bal;
+    html += `<div class="nw-row"><span class="nwr-l">${goal.name}</span><span class="nwr-r pos">$${fmt(bal)}</span></div>`;
+  });
+  html += `<div class="nw-total"><span class="nwt-l">Total tracked assets</span><span class="nwt-r pos">$${fmt(totalAssets)}</span></div></div>`;
+
+  // Liabilities
+  html += '<div class="card"><div class="nw-head">Liabilities</div>';
+  let totalLiab = 0;
+  (s.debts || []).forEach((d, i) => {
+    const bal = debtBalance(s, st, i);
+    totalLiab += bal;
+    html += `<div class="nw-row"><span class="nwr-l">${d.name}</span><span class="nwr-r neg">$${fmt(bal)}</span></div>`;
+  });
+  html += `<div class="nw-total"><span class="nwt-l">Total liabilities</span><span class="nwt-r neg">$${fmt(totalLiab)}</span></div>`;
+  html += '<div class="divider"></div>';
+  const netWorth = totalAssets - totalLiab;
+  html += `<div class="nw-total" style="padding-top:0"><span class="nwt-l">Net worth</span><span class="nwt-r ${netWorth >= 0 ? 'pos' : 'neg'}">$${fmt(Math.abs(netWorth))}</span></div>`;
+  html += '</div></div>';
+
+  document.getElementById('panel-networth').innerHTML = html;
+}
+
+// ════════════════════════════════════════
+// RENDERER — WINDFALLS
+// ════════════════════════════════════════
+function renderWindfalls() {
+  const st = household.state;
+  if (!st.windfalls) st.windfalls = {};
+  const items = st.windfallItems || [];
+
+  let html = '<div class="sec-head"><h2>Windfalls</h2><span class="sh-sub">every dollar has a job</span></div>';
+
+  if (items.length === 0) {
+    html += '<div class="note"><strong>No windfalls yet.</strong> Add expected windfalls below — bonus payments, tax refunds, bond refunds, etc.</div>';
+  }
+
+  items.forEach((wf, i) => {
+    const done = !!st.windfalls[wf.id];
+    html += `<div class="wf-row">
+      <div><div class="wf-label">${wf.label}</div><div class="wf-sub">${wf.destination || ''}</div></div>
+      <div class="tog ${done ? 'on' : ''}" onclick="toggleWindfall('${wf.id}')">
+        <div class="tog-box ${done ? 'on' : ''}">${done ? '&#10003;' : ''}</div>
+        <div class="tog-label">${done ? 'done' : 'pending'}</div>
+      </div>
+      <div class="wf-amt">${wf.amount || ''}</div>
+    </div>`;
+  });
+
+  // Add windfall form
+  html += `<div class="divider"></div>
+    <div class="card"><div class="c-label">Add a windfall</div>
+      <div class="grid3">
+        <div class="field-group"><div class="field-label">Name</div><input class="field-input" id="wfNewLabel" placeholder="April bonus"></div>
+        <div class="field-group"><div class="field-label">Amount</div><input class="field-input" id="wfNewAmt" placeholder="$3,000"></div>
+        <div class="field-group"><div class="field-label">Destination</div><input class="field-input" id="wfNewDest" placeholder="Wedding fund"></div>
+      </div>
+      <button class="btn btn-sm" onclick="addWindfall()">Add</button>
+    </div>`;
+
+  html += '<div style="margin-top:12px" class="note"><strong>Rule:</strong> Every windfall has a pre-assigned destination before it lands.</div>';
+
+  document.getElementById('panel-windfalls').innerHTML = html;
+}
+
+function addWindfall() {
+  const label = document.getElementById('wfNewLabel').value.trim();
+  const amount = document.getElementById('wfNewAmt').value.trim();
+  const destination = document.getElementById('wfNewDest').value.trim();
+  if (!label) return;
+
+  if (!household.state.windfallItems) household.state.windfallItems = [];
+  household.state.windfallItems.push({
+    id: 'wf_' + Date.now(),
+    label, amount, destination
+  });
+  debounceSave();
+  renderWindfalls();
+}
+
+function toggleWindfall(id) {
+  if (!household.state.windfalls) household.state.windfalls = {};
+  household.state.windfalls[id] = !household.state.windfalls[id];
+  debounceSave();
+  renderWindfalls();
+}
+
+// ════════════════════════════════════════
+// RENDERER — CHECKLIST
+// ════════════════════════════════════════
 function renderChecklist() {
+  const s = household.settings;
   const checkState = getMonthState('checklist');
-  const total = CHECKLIST_ITEMS.reduce((s,sec)=>s+sec.items.length,0);
-  const done  = Object.values(checkState).filter(Boolean).length;
-  const pct   = Math.round(done/total*100);
-  document.getElementById('checkPct').textContent = pct+'%';
-  document.getElementById('checkFill').style.width = pct+'%';
 
-  let html = '';
-  CHECKLIST_ITEMS.forEach(sec=>{
-    html += `<div class="check-sec-label">${sec.section}</div>`;
-    sec.items.forEach(item=>{
-      const isDone = !!checkState[item.id];
-      html += `<div class="check-item ${isDone?'done':''}" onclick="toggleCheck('${item.id}')">
-        <div class="ci-box">${isDone?'✓':''}</div>
-        <div><div class="ci-text">${item.text}</div><div class="ci-owner">${item.owner}</div></div>
-      </div>`;
-    });
+  // Auto-generate items from settings
+  const items = [];
+  items.push({ id: 'c_bills', text: 'All bills paid — check joint account', owner: 'Both' });
+  if (s.debts?.length) items.push({ id: 'c_debt_bal', text: 'Update all debt balances', owner: 'Both' });
+  (s.savingsGoals || []).forEach(g => {
+    items.push({ id: 'c_goal_' + g.id, text: 'Update ' + g.name + ' balance', owner: 'Both' });
   });
-  document.getElementById('checklistEl').innerHTML = html;
+  items.push({ id: 'c_spending', text: 'Review variable spending vs budget', owner: 'Both' });
+  items.push({ id: 'c_windfalls', text: 'Note any windfalls and confirm destination', owner: 'Both' });
+
+  // Custom items from state
+  const customItems = household.state.customChecklist || [];
+  customItems.forEach(ci => items.push(ci));
+
+  const total = items.length;
+  const done = items.filter(i => checkState[i.id]).length;
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+
+  let html = buildMonthNav();
+  html += '<div class="sec-head"><h2>Monthly Checklist</h2><span class="sh-sub">resets each month</span></div>';
+  html += `<div class="prog-wrap" style="margin-bottom:16px">
+    <div class="prog-label"><span>Complete</span><span>${pct}%</span></div>
+    <div class="prog-track" style="height:6px"><div class="prog-fill" style="width:${pct}%;background:var(--good)"></div></div>
+  </div>`;
+
+  items.forEach(item => {
+    const isDone = !!checkState[item.id];
+    html += `<div class="check-item ${isDone ? 'done' : ''}" onclick="toggleCheck('${item.id}')">
+      <div class="ci-box">${isDone ? '&#10003;' : ''}</div>
+      <div><div class="ci-text">${item.text}</div><div class="ci-owner">${item.owner || ''}</div></div>
+    </div>`;
+  });
+
+  // Add custom item
+  html += `<div class="divider"></div>
+    <div style="display:flex;gap:8px">
+      <input class="field-input" id="checkNewText" placeholder="Add a custom checklist item" style="flex:1">
+      <button class="btn btn-sm" onclick="addChecklistItem()">Add</button>
+    </div>`;
+
+  document.getElementById('panel-checklist').innerHTML = html;
 }
 
 function toggleCheck(id) {
@@ -1141,66 +1575,204 @@ function toggleCheck(id) {
   renderChecklist();
 }
 
-// ── WINDFALLS ──
-function renderWindfalls() {
-  if (!appState.global) appState.global = {};
-  if (!appState.global.windfalls) appState.global.windfalls = {};
-  const wfState = appState.global.windfalls;
-
-  WINDFALLS.forEach((group, gi)=>{
-    const el = document.getElementById(['wfRows','wfRows2','wfRows3'][gi]);
-    if(!el) return;
-    el.innerHTML = group.map(wf=>{
-      const done = !!wfState[wf.id];
-      return `<div class="wf-row">
-        <div><div class="wf-label">${wf.label}</div><div class="wf-sub">${wf.sub}</div></div>
-        <div class="tog ${done?'on':''}" onclick="toggleWindfall('${wf.id}')">
-          <div class="tog-box ${done?'on':''}">${done?'✓':''}</div>
-          <div class="tog-label">${done?'done ✓':'pending'}</div>
-        </div>
-        <div class="wf-amt">${wf.amt}</div>
-      </div>`;
-    }).join('');
-  });
-}
-
-function toggleWindfall(id) {
-  if (!appState.global) appState.global = {};
-  if (!appState.global.windfalls) appState.global.windfalls = {};
-  appState.global.windfalls[id] = !appState.global.windfalls[id];
+function addChecklistItem() {
+  const text = document.getElementById('checkNewText').value.trim();
+  if (!text) return;
+  if (!household.state.customChecklist) household.state.customChecklist = [];
+  household.state.customChecklist.push({ id: 'cc_' + Date.now(), text, owner: membership?.display_name || '' });
   debounceSave();
-  renderWindfalls();
+  renderChecklist();
 }
 
-// ── COUNTDOWN ──
-function updateCountdown() {
-  const wedding = new Date(2026,10,14);
-  const now = new Date();
-  const days = Math.ceil((wedding-now)/86400000);
-  const el = document.getElementById('hudCountdown');
-  if(el) el.textContent = days > 0 ? `${days}d away` : '🎉 Today!';
+// ════════════════════════════════════════
+// RENDERER — SETTINGS
+// ════════════════════════════════════════
+function renderSettings() {
+  const s = household.settings;
+  let html = '<div class="sec-head"><h2>Settings</h2></div>';
+
+  // Household
+  html += `<div class="settings-section">
+    <div class="settings-section-title">Household</div>
+    <div class="field-group"><div class="field-label">Household name</div><input class="field-input" value="${s.householdName || ''}" onblur="updSetting('householdName',this.value)"></div>
+    ${s.persons.map((p, i) => `<div class="field-group"><div class="field-label">Person ${i + 1} name</div><input class="field-input" value="${p.name}" onblur="updPersonName(${i},this.value)"></div>`).join('')}
+  </div>`;
+
+  // Income
+  html += '<div class="settings-section"><div class="settings-section-title">Income</div>';
+  s.persons.forEach((p, i) => {
+    html += `<div class="sec-label">${p.name}</div>
+    <div class="grid3">
+      <div class="field-group"><div class="field-label">Take-home ($)</div><input class="field-input" type="number" value="${p.takeHome}" onblur="updPersonField(${i},'takeHome',parseFloat(this.value)||0)"></div>
+      <div class="field-group"><div class="field-label">Frequency</div><select class="field-input" onchange="updPersonField(${i},'frequency',this.value)">
+        <option value="monthly" ${p.frequency==='monthly'?'selected':''}>Monthly</option>
+        <option value="fortnightly" ${p.frequency==='fortnightly'?'selected':''}>Fortnightly</option>
+        <option value="weekly" ${p.frequency==='weekly'?'selected':''}>Weekly</option>
+      </select></div>
+      <div class="field-group"><div class="field-label">${p.frequency === 'monthly' ? 'Pay day' : 'Anchor date'}</div>
+        <input class="field-input" ${p.frequency === 'monthly' ? 'type="number" value="' + (p.payDay||1) + '"' : 'type="date" value="' + (p.payDayAnchor||'') + '"'}
+          onblur="updPersonField(${i},${p.frequency === 'monthly' ? "'payDay',parseInt(this.value)||1" : "'payDayAnchor',this.value"})">
+      </div>
+    </div>`;
+  });
+  html += `<div class="grid2" style="margin-top:8px">
+    <div class="field-group"><div class="field-label">${s.persons[0]?.name || 'Person 1'} split %</div><input class="field-input" type="number" value="${s.splitPercent?.[0]||50}" onblur="updSplit(0,this.value)"></div>
+    <div class="field-group"><div class="field-label">${s.persons[1]?.name || 'Person 2'} split %</div><input class="field-input" type="number" value="${s.splitPercent?.[1]||50}" onblur="updSplit(1,this.value)"></div>
+  </div></div>`;
+
+  // Bills
+  html += '<div class="settings-section"><div class="settings-section-title">Bills</div>';
+  (s.bills || []).forEach((b, i) => {
+    html += `<div class="list-row">
+      <input class="field-input" style="flex:2" value="${b.name}" onblur="updBill(${i},'name',this.value)">
+      <input class="field-input" style="flex:1" type="number" value="${b.monthly}" onblur="updBill(${i},'monthly',parseFloat(this.value)||0)">
+      <button class="remove-btn" onclick="removeBill(${i})">x</button>
+    </div>`;
+  });
+  html += `<button class="btn btn-secondary btn-sm" onclick="addBill()" style="margin-top:8px">+ Add bill</button>
+    <div class="stat-row" style="margin-top:8px"><span class="sr-label">Total</span><span class="sr-value" style="color:var(--brass)">$${fmt(totalBillsMonthly(s))}/mo</span></div>
+  </div>`;
+
+  // Debts
+  html += '<div class="settings-section"><div class="settings-section-title">Debts</div>';
+  (s.debts || []).forEach((d, i) => {
+    html += `<div class="list-row" style="flex-wrap:wrap">
+      <input class="field-input" style="flex:2;min-width:120px" value="${d.name}" onblur="updDebt(${i},'name',this.value)">
+      <input class="field-input" style="flex:1;min-width:70px" type="number" value="${d.balance}" placeholder="Balance" onblur="updDebt(${i},'balance',parseFloat(this.value)||0)">
+      <input class="field-input" style="flex:1;min-width:50px" type="number" value="${(d.rate*100).toFixed(1)}" placeholder="Rate %" step="0.1" onblur="updDebt(${i},'rate',parseFloat(this.value)/100||0)">
+      <input class="field-input" style="flex:1;min-width:70px" type="number" value="${d.minPayment}" placeholder="Min $/mo" onblur="updDebt(${i},'minPayment',parseFloat(this.value)||0)">
+      <button class="remove-btn" onclick="removeDebt(${i})">x</button>
+    </div>`;
+  });
+  html += `<button class="btn btn-secondary btn-sm" onclick="addDebt()" style="margin-top:8px">+ Add debt</button></div>`;
+
+  // Goals
+  html += '<div class="settings-section"><div class="settings-section-title">Savings Goals</div>';
+  (s.savingsGoals || []).forEach((g, i) => {
+    html += `<div class="list-row" style="flex-wrap:wrap">
+      <input class="field-input" style="flex:2;min-width:120px" value="${g.name}" onblur="updGoal(${i},'name',this.value)">
+      <input class="field-input" style="flex:1;min-width:80px" type="number" value="${g.target}" placeholder="Target $" onblur="updGoal(${i},'target',parseFloat(this.value)||0)">
+      <input class="field-input" style="flex:1;min-width:80px" value="${g.where||''}" placeholder="Where held" onblur="updGoal(${i},'where',this.value)">
+      <button class="remove-btn" onclick="removeGoal(${i})">x</button>
+    </div>`;
+  });
+  html += `<button class="btn btn-secondary btn-sm" onclick="addGoal()" style="margin-top:8px">+ Add goal</button></div>`;
+
+  // Invite code
+  html += `<div class="settings-section"><div class="settings-section-title">Invite Partner</div>
+    <div class="c-sub" style="margin-bottom:12px">Generate a code to invite your partner to this household.</div>
+    <div class="invite-display" id="settingsInviteCode">${household.invite_code || 'No active code'}</div>
+    <button class="btn btn-secondary btn-sm" onclick="regenerateInvite()" style="margin-top:8px">Generate New Code</button>
+  </div>`;
+
+  document.getElementById('panel-settings').innerHTML = html;
 }
 
-// ── INIT ──
-function initApp() {
-  refreshMonthLabels();
-  refreshGlobalDisplays();
-  refreshDebtDisplays();
+// Settings update functions
+function updSetting(key, val) { household.settings[key] = val; saveSettings(); renderHUD(); }
+function updPersonName(idx, val) { household.settings.persons[idx].name = val; saveSettings(); renderHUD(); buildTabs(); }
+function updPersonField(idx, field, val) { household.settings.persons[idx][field] = val; saveSettings(); }
+function updSplit(idx, val) {
+  const v = parseInt(val) || 0;
+  household.settings.splitPercent[idx] = v;
+  household.settings.splitPercent[idx === 0 ? 1 : 0] = 100 - v;
+  saveSettings();
+  renderSettings();
+}
+function updBill(idx, field, val) { household.settings.bills[idx][field] = val; saveSettings(); }
+function updDebt(idx, field, val) { household.settings.debts[idx][field] = val; saveSettings(); }
+function updGoal(idx, field, val) { household.settings.savingsGoals[idx][field] = val; saveSettings(); }
+
+function addBill() {
+  if (!household.settings.bills) household.settings.bills = [];
+  household.settings.bills.push({ id: 'b_' + Date.now(), name: '', monthly: 0 });
+  saveSettings(); renderSettings();
+}
+function removeBill(idx) { household.settings.bills.splice(idx, 1); saveSettings(); renderSettings(); }
+function addDebt() {
+  if (!household.settings.debts) household.settings.debts = [];
+  household.settings.debts.push({ id: 'd_' + Date.now(), name: '', balance: 0, rate: 0, minPayment: 0 });
+  saveSettings(); renderSettings(); buildTabs();
+}
+function removeDebt(idx) { household.settings.debts.splice(idx, 1); saveSettings(); renderSettings(); buildTabs(); }
+function addGoal() {
+  if (!household.settings.savingsGoals) household.settings.savingsGoals = [];
+  household.settings.savingsGoals.push({ id: 'g_' + Date.now(), name: '', target: 0, current: 0, where: '' });
+  saveSettings(); renderSettings(); buildTabs();
+}
+function removeGoal(idx) { household.settings.savingsGoals.splice(idx, 1); saveSettings(); renderSettings(); buildTabs(); }
+
+async function regenerateInvite() {
+  const { data: code, error } = await sb.rpc('generate_invite_code', { p_household_id: household.id });
+  if (error) { alert(error.message); return; }
+  household.invite_code = code;
+  document.getElementById('settingsInviteCode').textContent = code;
+}
+
+// ════════════════════════════════════════
+// PAY DAY FLOW
+// ════════════════════════════════════════
+function showPayDay(personIndex, dateKey) {
+  const s = household.settings;
+  const p = s.persons[personIndex];
+  const alloc = payDayAllocations(s, personIndex);
+
+  const modal = document.getElementById('paydayModal');
+  modal.innerHTML = `<div class="modal-box">
+    <div class="sec-head"><h2>${p.name}'s Pay Day</h2></div>
+    <div class="c-sub" style="margin-bottom:16px">${monthLabel()}</div>
+    <div class="stat-row"><span class="sr-label">Take-home this pay</span><span class="sr-value" style="color:var(--good)">$${fmt(alloc.takeHome)}</span></div>
+    <div class="divider"></div>
+    <div class="stat-row"><span class="sr-label">Joint bills transfer</span><span class="sr-value">$${fmt(alloc.billsTransfer)}</span></div>
+    <div class="stat-row"><span class="sr-label">Everyday (yours to keep)</span><span class="sr-value" style="color:var(--brass)">$${fmt(alloc.everyday)}</span></div>
+    <div class="divider"></div>
+    <button class="btn" onclick="confirmPayDay('${dateKey}')">Mark Pay Day Complete</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('paydayModal').style.display='none'" style="margin-top:8px">Cancel</button>
+  </div>`;
+  modal.style.display = 'block';
+}
+
+function confirmPayDay(dateKey) {
+  const s = getMonthState('pay');
+  s[dateKey] = true;
+  setMonthState('pay', s);
+  document.getElementById('paydayModal').style.display = 'none';
   renderBudget();
-  renderWindfalls();
-  updateCountdown();
-  // Realtime subscription — when Jacynta updates, Liam sees it
-  sb.channel('finance_state')
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'finance_state',filter:`user_id=eq.${currentUser.id}`},
-      payload => {
-        appState = payload.new.state || {};
-        refreshGlobalDisplays();
-        refreshDebtDisplays();
-        renderBudget();
-        renderChecklist();
-        renderWindfalls();
-        setSyncStatus('synced');
-      })
+  renderDashboard();
+}
+
+// ════════════════════════════════════════
+// REALTIME & INIT
+// ════════════════════════════════════════
+function refreshAll() {
+  renderHUD();
+  const active = document.querySelector('.panel.active');
+  if (active) {
+    const id = active.id.replace('panel-', '');
+    const renderers = { dashboard: renderDashboard, budget: renderBudget, debt: renderDebt, goals: renderGoals, networth: renderNetWorth, windfalls: renderWindfalls, checklist: renderChecklist, settings: renderSettings };
+    if (renderers[id]) renderers[id]();
+  }
+}
+
+function initApp() {
+  buildTabs();
+  renderHUD();
+  renderDashboard();
+
+  // Realtime
+  sb.channel('household-sync')
+    .on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'households',
+      filter: 'id=eq.' + household.id
+    }, payload => {
+      household.settings = payload.new.settings;
+      household.state = payload.new.state;
+      household.invite_code = payload.new.invite_code;
+      refreshAll();
+      setSyncStatus('synced');
+    })
     .subscribe();
 }
 </script>
